@@ -1,6 +1,6 @@
 {
   "template": "/home/cclark/Code/sync/projects/cookiecutters/cpp-lib",
-  "commit": "89a6d399ca26ebf0eb3b6c40f2c042dc1e3ce621",
+  "commit": "866a97238c75e77084173d1a3a344b313aae9dd5",
   "checkout": null,
   "context": {
     "cookiecutter": {
