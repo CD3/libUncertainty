@@ -1,0 +1,18 @@
+{
+  "template": "/home/cclark/Code/sync/projects/cookiecutters/cpp-lib",
+  "commit": "89a6d399ca26ebf0eb3b6c40f2c042dc1e3ce621",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "libUncertainty",
+      "description": "A C++ library for working with uncertain quantities.",
+      "project_name_camel_case": "libUncertainty",
+      "cmake_lib_target": "libUncertainty",
+      "year": "2022",
+      "github_username": "CD3",
+      "author_name": "CD Clark III",
+      "_template": "/home/cclark/Code/sync/projects/cookiecutters/cpp-lib"
+    }
+  },
+  "directory": null
+}
