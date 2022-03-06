@@ -1,6 +1,9 @@
 #pragma once
 
 #include <utility>
+#include <cmath>
+#include <type_traits>
+#include "./utils.hpp"
 
 /** @file uncertain.hpp
   * @brief The uncertain class
@@ -16,6 +19,7 @@ class uncertain
  public:
   using nominal_type     = NT;
   using uncertainty_type = UT;
+  using this_type = uncertain<NT,UT>;
 
   uncertain()                 = default;
   uncertain(const uncertain&) = default;
@@ -47,6 +51,23 @@ class uncertain
   {
     out << a_val.nominal() << " +/- " << a_val.uncertainty();
     return out;
+  }
+
+  this_type normalize(size_t n = 1) const
+  {
+    uncertainty_type unc = sigfig_round(this->uncertainty(),n);
+    // the nominal value should be rounded to the same decimal position
+    // as the last significant figure of uncertainty.
+    // this means that the nominal value and the uncertainty can have
+    // a different number of significant figures.
+    // it turns out, that the difference will be equal the difference in
+    // the exponents of the two numbers expressed in scientific notation.
+    // NOTE: We are converting the uncertainty value to the nominal_type here
+    // to handle cases when the two are given in different units.
+    int unc_exp = scientific_notation_exponent(nominal_type(unc));
+    int nom_exp = scientific_notation_exponent(this->nominal());
+    nominal_type nom = sigfig_round(this->nominal(),n+nom_exp-unc_exp);
+    return {nom,unc};
   }
 
  private:
