@@ -1,0 +1,5 @@
+[requires]
+boost/1.72.0
+BoostUnitDefinitions/0.2@cd3/devel
+[generators]
+cmake

@@ -52,4 +52,16 @@ class uncertain
  private:
   std::pair<nominal_type, uncertainty_type> m_storage;
 };
+
+template<typename NT>
+uncertain<NT> make_uncertain(const NT& nom)
+{
+  return uncertain<NT>(nom);
+}
+
+template<typename NT, typename UT>
+uncertain<NT,UT> make_uncertain(const NT& nom, const UT& unc)
+{
+  return uncertain<NT,UT>(nom,unc);
+}
 }  // namespace libUncertainty

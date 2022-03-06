@@ -6,11 +6,14 @@
 #include <libUncertainty/propagate.hpp>
 #include <libUncertainty/uncertain.hpp>
 #include <libUncertainty/utils.hpp>
+
+#include <BoostUnitDefinitions/Units.hpp>
 /**
  * This file is used for developement. As new classes are created, small tests
  * are written here so that we can try to compile and use them.
  */
 
+using namespace boost::units;
 using namespace libUncertainty;
 
 TEST_CASE("General", "[devel]")
@@ -134,6 +137,52 @@ TEST_CASE("General", "[devel]")
 
       CHECK(y.nominal() == Approx(4));
       CHECK(y.uncertainty() == Approx(2.2 * 2.2 - 4));
+    }
+  }
+
+  SECTION("Boost.Units Integration")
+  {
+    SECTION("Length quantity")
+    {
+      uncertain<quantity<t::cm>> L(2*i::cm,0.1*i::cm);
+      uncertain<quantity<t::cm>> W(4*i::cm,0.2*i::cm);
+
+      auto A = error_propagators::basic::propagate_error([](quantity<t::cm> L, quantity<t::cm> W) { return L * W; }, L, W);
+
+      CHECK( A.nominal().value() == Approx(8) );
+      CHECK( A.uncertainty().value() == Approx(0.5656854) );
+      CHECK( quantity<t::m_p2>(A.nominal()).value() == Approx(0.0008) );
+      CHECK( quantity<t::mm_p2>(A.uncertainty()).value() == Approx(56.56854) );
+
+
+    }
+    SECTION("Different units")
+    {
+      SECTION("with full type")
+      {
+      uncertain<quantity<t::cm>,quantity<t::mm>> L(2*i::cm,1*i::mm);
+      uncertain<quantity<t::cm>,quantity<t::mm>> W(4*i::cm,2*i::mm);
+
+      auto A = error_propagators::basic::propagate_error([](quantity<t::cm> L, quantity<t::cm> W) { return L * W; }, L, W);
+
+      CHECK( A.nominal().value() == Approx(8) );
+      CHECK( A.uncertainty().value() == Approx(0.5656854) );
+      CHECK( quantity<t::m_p2>(A.nominal()).value() == Approx(0.0008) );
+      CHECK( quantity<t::mm_p2>(A.uncertainty()).value() == Approx(56.56854) );
+      }
+
+      SECTION("with helper function")
+      {
+      auto L = make_uncertain(2*i::cm,1*i::mm);
+      auto W = make_uncertain(4*i::cm,2*i::mm);
+
+      auto A = error_propagators::basic::propagate_error([](quantity<t::cm> L, quantity<t::cm> W) { return L * W; }, L, W);
+
+      CHECK( A.nominal().value() == Approx(8) );
+      CHECK( A.uncertainty().value() == Approx(0.5656854) );
+      CHECK( quantity<t::m_p2>(A.nominal()).value() == Approx(0.0008) );
+      CHECK( quantity<t::mm_p2>(A.uncertainty()).value() == Approx(56.56854) );
+      }
     }
   }
 }

@@ -24,10 +24,10 @@ configure_file( "${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/version.h"
 # find_package( Boost REQUIRED )
 # find_package( Eigen3 3.3 REQUIRED )
 # load conan build information if it exists
-if( EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake" )
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  conan_basic_setup(TARGETS)
-endif()
+#if( EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake" )
+#  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+#  conan_basic_setup(TARGETS)
+#endif()
 
 # if( NOT TARGET CONAN_PKG::boost )
 # find_package( Boost COMPONENTS filesystem REQUIRED )
@@ -35,12 +35,13 @@ endif()
 
 
 set( LIB_TARGET libUncertainty )
-add_library( ${LIB_TARGET} )
+add_library( ${LIB_TARGET} INTERFACE )
 add_library( ${PROJECT_NAME}::${LIB_TARGET} ALIAS ${LIB_TARGET} )
 target_sources(
   ${LIB_TARGET}
-  PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libUncertainty/RemoveMe.cpp>
+  INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libUncertainty/uncertain.hpp>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libUncertainty/propagate.hpp>
 )
 target_include_directories( ${LIB_TARGET} INTERFACE
   $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/src>
@@ -55,7 +56,6 @@ target_link_libraries(${LIB_TARGET}
                      )
 
 if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR} AND BUILD_UNIT_TESTS)
-enable_testing()
 add_subdirectory( tests )
 endif()
 
