@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <cmath>
+#include <array>
 #include <type_traits>
 #include "./utils.hpp"
 
