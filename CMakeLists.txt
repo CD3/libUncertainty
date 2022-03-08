@@ -55,6 +55,7 @@ target_link_libraries(${LIB_TARGET}
                           #Eigen3::Eigen
                      )
 
+             target_compile_features(${LIB_TARGET} INTERFACE cxx_std_17)
 if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR} AND BUILD_UNIT_TESTS)
 add_subdirectory( tests )
 endif()
