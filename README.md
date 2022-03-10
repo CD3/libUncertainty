@@ -101,5 +101,5 @@ A.nominal();      // 8 cm
 A.uncertainty();  // 0.5656754 cm
 ```
 
-Currently, error propagation is very limited. Only functions with 20 or fewer arguments are supported, and correlated
-inputs are NOT supported.
+Currently, error propagation is very limited. Only functions with 20 or fewer arguments are supported. Correlated
+inputs are supported, but you have to construct a correlation matrix manually.

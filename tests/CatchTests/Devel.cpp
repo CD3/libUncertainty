@@ -7,6 +7,7 @@
 #include <BoostUnitDefinitions/Units.hpp>
 #include <boost/any.hpp>
 #include <boost/type_traits/function_traits.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 
 #include <libUncertainty/propagate.hpp>
 #include <libUncertainty/uncertain.hpp>
@@ -376,6 +377,24 @@ TEST_CASE("Usage")
       }
     }
   }
+}
+
+TEST_CASE("Correlations")
+{
+  boost::numeric::ublas::matrix<double> corr(2,2);
+  corr(0,0) = 1;
+  corr(1,0) = 1;
+  corr(0,1) = 1;
+  corr(1,1) = 1;
+
+  uncertain<double> x(2,0.1),y(3,0.1);
+
+  auto z = basic_error_propagator::propagate_error( [](double a, double b){ return b-a; }, corr, x, y);
+
+  // a and b are directly correlated, so there is no uncertainy in their difference.
+  // the nominal and upper values should be the same.
+  CHECK( z.nominal() == Approx(1) );
+  CHECK( z.upper() == Approx(1) );
 }
 
 TEST_CASE("Bencharmks")

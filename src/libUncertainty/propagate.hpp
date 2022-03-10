@@ -2,6 +2,7 @@
 #include "./uncertain.hpp"
 #include <array>
 #include <numeric>
+#include <boost/numeric/ublas/vector.hpp>
 
 /** @file propagate.hpp
   * @brief 
@@ -12,6 +13,8 @@
 namespace libUncertainty
 {
 struct basic_error_propagator {
+  template<typename T, size_t N>
+  using static_vector = boost::numeric::ublas::fixed_vector<T,N>;
 
   /**
    * Propagate error through a function f.
@@ -26,12 +29,42 @@ struct basic_error_propagator {
     // two returned values has a different type than a single return value.
     // For example, if the function returns a type representing a quantity
     // with a unit that has an offset (i.e. temperature in celcius: 100 C - 90 C 10 delta_C \ne 10 C)
-    std::array<decltype(a_f(args.nominal() ...)-a_f(args.upper() ...) ), sizeof...(Args)> deviations;
+    static_vector<decltype(a_f(args.nominal() ...)-a_f(args.upper() ...) ), sizeof...(Args)> deviations;
     auto nominal = propagate_error(a_f, deviations, std::forward<Args>(args) ... );
     auto unc = sqrt(std::inner_product(deviations.begin()+1, deviations.end(), deviations.begin()+1,deviations[0]*deviations[0]));
     uncertain< decltype(a_f( args.nominal() ... ) ) > ret(nominal,unc);
     return ret;
   }
+
+  /**
+   * Propagate error through a function f.
+   *
+   * DOES NOT HANDLE CORRELATED INPUTS
+   */
+  template<typename F, typename CorrelationMatrixType, typename ...Args>
+  static auto propagate_error(F a_f, const CorrelationMatrixType& a_correlation_matrix, Args ... args)
+   -> uncertain< decltype(a_f( args.nominal() ... ) ) >
+  {
+    // Need to be careful here. It is possible that the difference between
+    // two returned values has a different type than a single return value.
+    // For example, if the function returns a type representing a quantity
+    // with a unit that has an offset (i.e. temperature in celcius: 100 C - 90 C 10 delta_C \ne 10 C)
+    static_vector<decltype(a_f(args.nominal() ...)-a_f(args.upper() ...) ), sizeof...(Args)> deviations;
+    auto nominal = propagate_error(a_f, deviations, std::forward<Args>(args) ... );
+    auto sum = std::inner_product(deviations.begin()+1, deviations.end(), deviations.begin()+1,deviations[0]*deviations[0]);
+    for(int i = 0; i < deviations.size(); i++)
+    {
+      for(int j = i+1; j < deviations.size(); j++)
+      {
+        sum += 2*a_correlation_matrix(i,j)*deviations[i]*deviations[j];
+      }
+    }
+    auto unc = sqrt(sum);
+    uncertain< decltype(a_f( args.nominal() ... ) ) > ret(nominal,unc);
+    return ret;
+  }
+
+
 
   private:
 
@@ -42,7 +75,7 @@ template<typename F, typename T,
 typename N0, typename U0
 >
 static auto propagate_error(F a_f,
-std::array<T,1>& a_deviations,
+static_vector<T,1>& a_deviations,
 const uncertain<N0,U0>& a_a0
 )
 {
@@ -56,7 +89,7 @@ typename N0, typename U0,
 typename N1, typename U1
 >
 static auto propagate_error(F a_f,
-std::array<T,2>& a_deviations,
+static_vector<T,2>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1
 )
@@ -73,7 +106,7 @@ typename N1, typename U1,
 typename N2, typename U2
 >
 static auto propagate_error(F a_f,
-std::array<T,3>& a_deviations,
+static_vector<T,3>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2
@@ -93,7 +126,7 @@ typename N2, typename U2,
 typename N3, typename U3
 >
 static auto propagate_error(F a_f,
-std::array<T,4>& a_deviations,
+static_vector<T,4>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -116,7 +149,7 @@ typename N3, typename U3,
 typename N4, typename U4
 >
 static auto propagate_error(F a_f,
-std::array<T,5>& a_deviations,
+static_vector<T,5>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -142,7 +175,7 @@ typename N4, typename U4,
 typename N5, typename U5
 >
 static auto propagate_error(F a_f,
-std::array<T,6>& a_deviations,
+static_vector<T,6>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -171,7 +204,7 @@ typename N5, typename U5,
 typename N6, typename U6
 >
 static auto propagate_error(F a_f,
-std::array<T,7>& a_deviations,
+static_vector<T,7>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -203,7 +236,7 @@ typename N6, typename U6,
 typename N7, typename U7
 >
 static auto propagate_error(F a_f,
-std::array<T,8>& a_deviations,
+static_vector<T,8>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -238,7 +271,7 @@ typename N7, typename U7,
 typename N8, typename U8
 >
 static auto propagate_error(F a_f,
-std::array<T,9>& a_deviations,
+static_vector<T,9>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -276,7 +309,7 @@ typename N8, typename U8,
 typename N9, typename U9
 >
 static auto propagate_error(F a_f,
-std::array<T,10>& a_deviations,
+static_vector<T,10>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -317,7 +350,7 @@ typename N9, typename U9,
 typename N10, typename U10
 >
 static auto propagate_error(F a_f,
-std::array<T,11>& a_deviations,
+static_vector<T,11>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -361,7 +394,7 @@ typename N10, typename U10,
 typename N11, typename U11
 >
 static auto propagate_error(F a_f,
-std::array<T,12>& a_deviations,
+static_vector<T,12>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -408,7 +441,7 @@ typename N11, typename U11,
 typename N12, typename U12
 >
 static auto propagate_error(F a_f,
-std::array<T,13>& a_deviations,
+static_vector<T,13>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -458,7 +491,7 @@ typename N12, typename U12,
 typename N13, typename U13
 >
 static auto propagate_error(F a_f,
-std::array<T,14>& a_deviations,
+static_vector<T,14>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -511,7 +544,7 @@ typename N13, typename U13,
 typename N14, typename U14
 >
 static auto propagate_error(F a_f,
-std::array<T,15>& a_deviations,
+static_vector<T,15>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -567,7 +600,7 @@ typename N14, typename U14,
 typename N15, typename U15
 >
 static auto propagate_error(F a_f,
-std::array<T,16>& a_deviations,
+static_vector<T,16>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -626,7 +659,7 @@ typename N15, typename U15,
 typename N16, typename U16
 >
 static auto propagate_error(F a_f,
-std::array<T,17>& a_deviations,
+static_vector<T,17>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -688,7 +721,7 @@ typename N16, typename U16,
 typename N17, typename U17
 >
 static auto propagate_error(F a_f,
-std::array<T,18>& a_deviations,
+static_vector<T,18>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -753,7 +786,7 @@ typename N17, typename U17,
 typename N18, typename U18
 >
 static auto propagate_error(F a_f,
-std::array<T,19>& a_deviations,
+static_vector<T,19>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,
@@ -821,7 +854,7 @@ typename N18, typename U18,
 typename N19, typename U19
 >
 static auto propagate_error(F a_f,
-std::array<T,20>& a_deviations,
+static_vector<T,20>& a_deviations,
 const uncertain<N0,U0>& a_a0,
 const uncertain<N1,U1>& a_a1,
 const uncertain<N2,U2>& a_a2,

@@ -22,7 +22,7 @@ def print_instance(n):
   # const uncertain<N3,U3>& a_a3,
   # const uncertain<N4,U4>& a_a4,
   # const uncertain<N5,U5>& a_a5
-  print(f"std::array<T,{n}>& a_deviations,")
+  print(f"static_vector<T,{n}>& a_deviations,")
   for i in range(n):
       line = f"const uncertain<N{i},U{i}>& a_a{i}"
       if i < n-1:
