@@ -51,6 +51,8 @@ def print_instance(n):
 print("// BEGIN GENERATED CODE")
 print("// this code was generated using the generate_basic_error_propagator_propagate_error_templates.py script")
 print("// to delete this code, you can run (in vim) :g/^\s*\/\/ BEGIN GENERATED CODE/,/^\s*\/\/ END GENERATED CODE/ d")
+print("// to reinsert it, you can run (in vim) :.! python scripts/generate_basic_error_propagator_propagate_error_templates.py")
+print("// I'm sorry this is so old-school, but your debugger will thank me...")
 for i in range(20):
     print_instance(i+1)
     print()

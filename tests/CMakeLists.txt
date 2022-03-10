@@ -33,6 +33,7 @@ target_compile_definitions( ${testName} PRIVATE -DTESTING )
 target_link_libraries(${testName} Catch libUncertainty
                         $<$<TARGET_EXISTS:CONAN_PKG::boost>:CONAN_PKG::boost>
                         $<$<TARGET_EXISTS:CONAN_PKG::BoostUnitDefinitions>:CONAN_PKG::BoostUnitDefinitions>
+                        $<$<TARGET_EXISTS:CONAN_PKG::uncertainties-cpp>:CONAN_PKG::uncertainties-cpp>
   )
 target_include_directories( ${testName} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 set_target_properties(${testName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${binDir})
