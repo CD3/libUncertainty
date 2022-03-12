@@ -6,9 +6,10 @@
 
 #include <BoostUnitDefinitions/Units.hpp>
 #include <boost/any.hpp>
-#include <boost/type_traits/function_traits.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/type_traits/function_traits.hpp>
 
+#include <libUncertainty/correlation.hpp>
 #include <libUncertainty/propagate.hpp>
 #include <libUncertainty/uncertain.hpp>
 #include <libUncertainty/utils.hpp>
@@ -29,118 +30,6 @@
 using namespace boost::units;
 using namespace libUncertainty;
 
-struct variable_store {
- private:
-  std::map<const std::string, boost::any> m_storage;
-
- public:
-  template<typename T>
-  void add(const std::string& a_name)
-  {
-    m_storage[a_name] = T();
-  }
-
-  template<typename T>
-  void add(const std::string& a_name, T a_t)
-  {
-    m_storage[a_name] = T(std::move(a_t));
-  }
-
-  template<typename T>
-  T& get(const std::string& a_name)
-  {
-    return *boost::any_cast<T>(&m_storage.at(a_name));
-  }
-};
-
-struct uncertainty_convention {
- private:
-  variable_store m_store;
-
- public:
-  variable_store&       get_variable_store() { return m_store; }
-  const variable_store& get_variable_store() const { return m_store; }
-
-  template<typename T>
-  void add_variable(const std::string& a_name)
-  {
-    m_store.add<uncertain<T>>(a_name);
-  }
-
-  template<typename T>
-  void add_variable(const std::string& a_name, T a_t)
-  {
-    m_store.add(a_name, uncertain<T>(std::move(a_t)));
-  }
-
-  template<typename T, typename U>
-  void add_variable(const std::string& a_name, T a_t, U a_u)
-  {
-    m_store.add(a_name, uncertain<T, U>(std::move(a_t), std::move(a_u)));
-  }
-
-  template<typename T>
-  uncertain<T>& get_variable(const std::string& a_name)
-  {
-    return m_store.get<uncertain<T>>(a_name);
-  }
-
-  template<typename T>
-  const uncertain<T>& get_variable(const std::string& a_name) const
-  {
-    return m_store.get<uncertain<T>>(a_name);
-  }
-
-  template<typename FR, typename FA1, typename FA2>
-  uncertain<FR> propagate_error(std::function<FR(FA1, FA2)> a_f, const std::string a_a1, const std::string a_a2)
-  {
-    auto nz  = a_f(this->get_variable<FA1>(a_a1).nominal(),
-                  this->get_variable<FA2>(a_a2).nominal());
-    auto dz1 = a_f(this->get_variable<FA1>(a_a1).upper(),
-                   this->get_variable<FA2>(a_a2).nominal()) -
-               nz;
-    auto dz2 = a_f(this->get_variable<FA1>(a_a1).nominal(),
-                   this->get_variable<FA2>(a_a2).upper()) -
-               nz;
-    auto dz = sqrt(dz1 * dz1 + dz2 * dz2);
-
-    std::array<double, 2> correlation_coefficients;
-
-    correlation_coefficients[0] = dz1 / dz;
-    correlation_coefficients[1] = dz2 / dz;
-
-    uncertain<FR> z(nz, dz);
-
-    return {nz, dz};
-  }
-};
-
-TEST_CASE("uncertainty_convention")
-{
-  SECTION("variable_store")
-  {
-    variable_store store;
-    store.add<double>("x", 1.1);
-    CHECK(store.get<double>("x") == Approx(1.1));
-    store.get<double>("x") = 2.1;
-    CHECK(store.get<double>("x") == Approx(2.1));
-  }
-
-  uncertainty_convention conv;
-  conv.add_variable<double>("x", 2.1, 0.1);
-  conv.add_variable<double>("y", 3.2, 0.2);
-
-  {
-    auto z = conv.propagate_error(std::function<double(double, double)>(std::plus<double>()), "x", "y");
-    CHECK(z.nominal() == Approx(5.3));
-    CHECK(z.uncertainty() == Approx(sqrt(0.05)));
-  }
-
-  {
-    // auto z = conv.propagate_error([](double x, double y)->double{return x+y;}, "x", "y");
-    // CHECK(z.nominal() == Approx(5.3));
-  }
-}
 
 TEST_CASE("Usage")
 {
@@ -381,23 +270,129 @@ TEST_CASE("Usage")
 
 TEST_CASE("Correlations")
 {
-  boost::numeric::ublas::matrix<double> corr(2,2);
-  corr(0,0) = 1;
-  corr(1,0) = 1;
-  corr(0,1) = 1;
-  corr(1,1) = 1;
+  SECTION("Correlation matrix")
+  {
+    correlation_matrix<double> mat(3);
+    mat(0, 1) = 0.1;
+    mat(0, 2) = 0.2;
+    mat(1, 2) = 0.3;
 
-  uncertain<double> x(2,0.1),y(3,0.1);
+    CHECK(mat(1, 0) == Approx(0.1));
+  }
 
-  auto z = basic_error_propagator::propagate_error( [](double a, double b){ return b-a; }, corr, x, y);
+  SECTION("Error propagation w/ correlation matrix.")
+  {
+    boost::numeric::ublas::matrix<double> corr(2, 2);
+    corr(0, 0) = 1;
+    corr(1, 0) = 1;
+    corr(0, 1) = 1;
+    corr(1, 1) = 1;
 
-  // a and b are directly correlated, so there is no uncertainy in their difference.
-  // the nominal and upper values should be the same.
-  CHECK( z.nominal() == Approx(1) );
-  CHECK( z.upper() == Approx(1) );
+    uncertain<double> x(2, 0.1), y(3, 0.1);
+
+    auto z = basic_error_propagator::propagate_error([](double a, double b) { return b - a; }, corr, x, y);
+
+    // a and b are directly correlated, so there is no uncertainy in their difference.
+    // the nominal and upper values should be the same.
+    CHECK(z.nominal() == Approx(1));
+    CHECK(z.upper() == Approx(1));
+  }
+
+  SECTION("add_correlation_coefficients Mixin")
+  {
+    add_correlation_coefficient_array<uncertain<double>> x( {2.2, 0.1} );
+    add_correlation_coefficient_array<uncertain<double>> y = {3.3, 0.2};
+
+    CHECK(x.get_correlation_coefficients().size() == 0);
+    x.set_correlation_coefficient_array_size(3);
+    x.get_correlation_coefficients()[0] = 1;
+    x.get_correlation_coefficients()[1] = 2;
+    x.get_correlation_coefficients()[2] = 3;
+
+    auto z = x;
+
+    CHECK(x.get_correlation_coefficients().size() == 3);
+    CHECK(x.get_correlation_coefficients()[0] == Approx(1));
+    CHECK(x.get_correlation_coefficients()[1] == Approx(2));
+    CHECK(x.get_correlation_coefficients()[2] == Approx(3));
+
+    CHECK(z.get_correlation_coefficients().size() == 3);
+    CHECK(z.get_correlation_coefficients()[0] == Approx(1));
+    CHECK(z.get_correlation_coefficients()[1] == Approx(2));
+    CHECK(z.get_correlation_coefficients()[2] == Approx(3));
+
+
+  }
+
+  SECTION("Correlation store")
+  {
+    correlation_store<double> store;
+    store.add(1, 0.1);
+    store.add(2, 0.2);
+
+    CHECK_THROWS( store.add(2, 0.1) );
+
+    CHECK(store.get(1) == Approx(0.1));
+    CHECK(store.get(2) == Approx(0.2));
+
+  }
+
+  SECTION("Error propagation w/ correlation")
+  {
+    SECTION("Doubles")
+    {
+      uncertain<double> x(1, 0.1), y(2, 0.2);
+
+      SECTION("Independent")
+      {
+      auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](double a, double b) { return a + b; }, x, y);
+
+      double unc = sqrt(0.1*0.1 + 0.2*0.2);
+      CHECK( z_and_correlation.nominal() == Approx(3) );
+      CHECK( z_and_correlation.upper() == Approx(3 + unc) );
+      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
+      CHECK( z_and_correlation.get_correlation_coefficient(0) == Approx( 0.1 / unc) );
+      CHECK( z_and_correlation.get_correlation_coefficient(1) == Approx( 0.2 / unc) );
+      }
+
+      SECTION("Correlated")
+      {
+      correlation_matrix<double> corr(2);
+      corr(0,1) = -1;
+
+      auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](double a, double b) { return a + b; }, corr, x, y);
+
+      double unc = 0.1
+      CHECK( z_and_correlation.nominal() == Approx(3) );
+      CHECK( z_and_correlation.upper() == Approx(3+unc) );
+      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
+      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
+      CHECK( z_and_correlation.get_correlation_coefficient(0) == Approx( (0.1 + 0.2*-1) / unc) );
+      CHECK( z_and_correlation.get_correlation_coefficient(1) == Approx( (0.2 + 0.1*-1) / unc) );
+
+      }
+
+    }
+
+    SECTION("boost quantities")
+    {
+      uncertain<quantity<t::cm>> x(1*i::cm, 0.1*i::cm), y(2*i::cm, 0.2*i::cm);
+      auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](auto a, auto b) { return a * b; }, x, y);
+
+      double unc = sqrt(0.2*0.2 + 0.2*0.2);
+      CHECK( z_and_correlation.nominal().value() == Approx(2) );
+      CHECK( z_and_correlation.upper().value() == Approx(2 + unc) );
+      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
+      CHECK( z_and_correlation.get_correlation_coefficient(0) == Approx( 0.2 / unc) );
+      CHECK( z_and_correlation.get_correlation_coefficient(1) == Approx( 0.2 / unc) );
+    }
+
+
+
+  }
 }
 
-TEST_CASE("Bencharmks")
+TEST_CASE("Bencharmks","[.][benchmarks]")
 {
   SECTION("Error Propagation")
   {
@@ -427,11 +422,10 @@ TEST_CASE("Bencharmks")
         return 2 * M_PI * (1 - uncertainties::cos(alpha / 2));
       };
       uncertainties::udouble Omega = 2 * M_PI * (1 - uncertainties::cos(alpha / 2));
-      std::stringstream out;
+      std::stringstream      out;
       out << Omega;
 
-      CHECK( out.str() == "(3.14 ± 0.09)e-2" );
-
+      CHECK(out.str() == "(3.14 ± 0.09)e-2");
     }
     SECTION("libUncertainty calculations")
     {
@@ -440,14 +434,44 @@ TEST_CASE("Bencharmks")
       {
         return basic_error_propagator::propagate_error([](double alpha) { return 2 * M_PI * (1 - cos(alpha / 2)); }, alpha);
       };
-      auto Omega = basic_error_propagator::propagate_error([](double alpha) { return 2 * M_PI * (1 - cos(alpha / 2)); }, alpha);
+      auto              Omega = basic_error_propagator::propagate_error([](double alpha) { return 2 * M_PI * (1 - cos(alpha / 2)); }, alpha);
       std::stringstream out;
       out << Omega;
-      CHECK( out.str() == "0.0313898 +/- 0.000947941" );
+      CHECK(out.str() == "0.0313898 +/- 0.000947941");
       out.str("");
       out << Omega.normalize();
-      CHECK( out.str() == "0.0314 +/- 0.0009" );
-
+      CHECK(out.str() == "0.0314 +/- 0.0009");
     }
+  }
+}
+
+TEST_CASE("id'ed variables")
+{
+  SECTION("getting unique ids")
+  {
+    CHECK(get_uniq_id() == 1);
+    CHECK(get_uniq_id() == 2);
+  }
+
+  SECTION("id'ed uncertain double")
+  {
+    add_id<uncertain<double>> x;
+    x = uncertain<double>(2,0.2);
+    add_id<uncertain<float>>  y(1,0.1);
+    add_id<uncertain<double>> z;
+    z = x;
+
+    CHECK( y.get_id() > x.get_id() );
+    CHECK( z.get_id() == x.get_id() );
+
+    CHECK( z.nominal() == Approx(2) );
+    CHECK( z.upper() == Approx(2.2) );
+
+    z.new_id();
+    CHECK( z.get_id() > y.get_id() );
+
+
+
+
   }
 }

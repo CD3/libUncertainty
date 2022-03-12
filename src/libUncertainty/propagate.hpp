@@ -25,7 +25,7 @@ struct basic_error_propagator {
   static auto propagate_error(F a_f, Args ... args)
    -> uncertain< decltype(a_f( args.nominal() ... ) ) >
   {
-    // Need to be careful here. It is possible that the difference between
+    // [1] Need to be careful here. It is possible that the difference between
     // two returned values has a different type than a single return value.
     // For example, if the function returns a type representing a quantity
     // with a unit that has an offset (i.e. temperature in celcius: 100 C - 90 C 10 delta_C \ne 10 C)
@@ -37,18 +37,13 @@ struct basic_error_propagator {
   }
 
   /**
-   * Propagate error through a function f.
-   *
-   * DOES NOT HANDLE CORRELATED INPUTS
+   * Propagate error through a function f with a correlations passed in as a matrix.
    */
   template<typename F, typename CorrelationMatrixType, typename ...Args>
   static auto propagate_error(F a_f, const CorrelationMatrixType& a_correlation_matrix, Args ... args)
    -> uncertain< decltype(a_f( args.nominal() ... ) ) >
   {
-    // Need to be careful here. It is possible that the difference between
-    // two returned values has a different type than a single return value.
-    // For example, if the function returns a type representing a quantity
-    // with a unit that has an offset (i.e. temperature in celcius: 100 C - 90 C 10 delta_C \ne 10 C)
+    // See note [1] above
     static_vector<decltype(a_f(args.nominal() ...)-a_f(args.upper() ...) ), sizeof...(Args)> deviations;
     auto nominal = propagate_error(a_f, deviations, std::forward<Args>(args) ... );
     auto sum = std::inner_product(deviations.begin()+1, deviations.end(), deviations.begin()+1,deviations[0]*deviations[0]);
@@ -63,6 +58,65 @@ struct basic_error_propagator {
     uncertain< decltype(a_f( args.nominal() ... ) ) > ret(nominal,unc);
     return ret;
   }
+
+  /**
+   * Propagate error through a function f and returns the result with correlations.
+   *
+   * DOES NOT HANDLE CORRELATED INPUTS
+   */
+  template<typename F, typename ...Args>
+  static auto propagate_error_and_correlation(F a_f, Args ... args)
+   -> add_correlation_coefficient_array<uncertain< decltype(a_f( args.nominal() ... ) ) >,double>
+  {
+    // See note [1] above
+    static_vector<decltype(a_f(args.nominal() ...)-a_f(args.upper() ...) ), sizeof...(Args)> deviations;
+    auto nominal = propagate_error(a_f, deviations, std::forward<Args>(args) ... );
+    auto unc = sqrt(std::inner_product(deviations.begin()+1, deviations.end(), deviations.begin()+1,deviations[0]*deviations[0]));
+    add_correlation_coefficient_array<uncertain< decltype(a_f( args.nominal() ... ) ) >,double> ret(nominal,unc);
+    ret.set_correlation_coefficient_array_size(sizeof...(Args));
+    std::transform( deviations.begin(), deviations.end(), ret.get_correlation_coefficients().begin(),
+        [&unc](auto dev){ return dev/unc; }
+        );
+    return ret;
+  }
+
+
+  /**
+   * Propagate error through a function f with correlations and returns the result with correlations.
+   */
+  template<typename F, typename CorrelationMatrixType, typename ...Args>
+  static auto propagate_error_and_correlation(F a_f, const CorrelationMatrixType& a_correlation_matrix,  Args ... args)
+   -> add_correlation_coefficient_array<uncertain< decltype(a_f( args.nominal() ... ) ) >,double>
+  {
+    // See note [1] above
+    using deviations_type = decltype(a_f(args.nominal() ...)-a_f(args.upper() ...) );
+    static_vector<deviations_type, sizeof...(Args)> deviations;
+    auto nominal = propagate_error(a_f, deviations, std::forward<Args>(args) ... );
+    auto sum = std::inner_product(deviations.begin()+1, deviations.end(), deviations.begin()+1,deviations[0]*deviations[0]);
+    for(int i = 0; i < deviations.size(); i++)
+    {
+      for(int j = i+1; j < deviations.size(); j++)
+      {
+        sum += 2*a_correlation_matrix(i,j)*deviations[i]*deviations[j];
+      }
+    }
+    auto unc = sqrt(sum);
+    add_correlation_coefficient_array<uncertain< decltype(a_f( args.nominal() ... ) ) >,double> ret(nominal,unc);
+    ret.set_correlation_coefficient_array_size(sizeof...(Args));
+    for(int i = 0; i < sizeof...(Args); ++i)
+    {
+      auto sum = deviations[i];
+      for(int j = 0; j < sizeof...(Args); ++j)
+      {
+        if( i != j)
+          sum += a_correlation_matrix(i,j)*deviations[j];
+      }
+      ret.get_correlation_coefficients()[i] = sum/unc;
+    }
+    return ret;
+  }
+
+
 
 
 

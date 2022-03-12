@@ -58,4 +58,33 @@ auto scientific_notation_exponent(T t) -> decltype(std::floor(std::log10(t.value
   return std::floor(std::log10(t.value()));
 }
 
+/**
+ * A function that returns a uniq ID each time it is called.
+ */
+size_t get_uniq_id()
+{
+  static size_t id = 0;
+  return ++id;
+}
+
+/**
+ * A mixin class for adding an ID to a variable.
+ * Used to track correlations between variables.
+ */
+template<typename BASE>
+class add_id : public BASE
+{
+  private:
+    size_t id = get_uniq_id();
+
+  public:
+    using BASE::BASE;
+    using BASE::operator=;
+
+    size_t get_id() const {return id;}
+    void new_id() {id = get_uniq_id();}
+
+
+};
+
 }  // namespace libUncertainty
