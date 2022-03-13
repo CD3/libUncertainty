@@ -16,6 +16,9 @@
 
 namespace libUncertainty
 {
+  /**
+   * A class that provides basic error propagation through arbitrary functions.
+   */
 struct basic_error_propagator {
   template<typename T, size_t N>
   using static_vector = boost::numeric::ublas::fixed_vector<T, N>;

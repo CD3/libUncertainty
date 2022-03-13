@@ -160,6 +160,7 @@ struct correlation_store {
 /**
  * Returns a reference to a static, global correlation store.
  */
+inline
 correlation_store<double>& get_global_correlation_store()
 {
   static correlation_store<double> store;

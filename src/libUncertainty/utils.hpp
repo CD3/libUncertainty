@@ -61,6 +61,7 @@ auto scientific_notation_exponent(T t) -> decltype(std::floor(std::log10(t.value
 /**
  * A function that returns a uniq ID each time it is called.
  */
+inline
 size_t get_uniq_id()
 {
   static size_t id = 0;
