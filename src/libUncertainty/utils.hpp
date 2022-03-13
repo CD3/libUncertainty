@@ -83,8 +83,32 @@ class add_id : public BASE
 
     size_t get_id() const {return id;}
     void new_id() {id = get_uniq_id();}
+    void clear_id() {id = 0;}
 
 
 };
+
+template<unsigned P> struct priority: priority<P-1> {};
+template<> struct priority<0> {};
+
+template<typename T>
+size_t get_id(const T& a_var)
+{
+  return get_id(a_var,priority<2>{});
+}
+
+template<typename T>
+size_t get_id(const T& a_var, priority<0>)
+{
+  return 0;
+}
+
+template<typename T>
+auto get_id(const T& a_var, priority<1>) -> decltype(a_var.get_id())
+{
+  return a_var.get_id();
+}
+
+
 
 }  // namespace libUncertainty

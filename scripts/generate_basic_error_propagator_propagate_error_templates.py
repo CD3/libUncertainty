@@ -14,7 +14,7 @@ def print_instance(n):
       print(line)
 
   print(">")
-  print("static auto propagate_error(F a_f,")
+  print("static auto _propagate_error(F a_f,")
   # need to generate something like:
   # std::array<T,5>& a_deviations,
   # const uncertain<N1,U1>& a_a1,

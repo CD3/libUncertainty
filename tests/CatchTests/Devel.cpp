@@ -30,7 +30,6 @@
 using namespace boost::units;
 using namespace libUncertainty;
 
-
 TEST_CASE("Usage")
 {
   SECTION("Sigfig rounding")
@@ -300,7 +299,7 @@ TEST_CASE("Correlations")
 
   SECTION("add_correlation_coefficients Mixin")
   {
-    add_correlation_coefficient_array<uncertain<double>> x( {2.2, 0.1} );
+    add_correlation_coefficient_array<uncertain<double>> x({2.2, 0.1});
     add_correlation_coefficient_array<uncertain<double>> y = {3.3, 0.2};
 
     CHECK(x.get_correlation_coefficients().size() == 0);
@@ -320,20 +319,38 @@ TEST_CASE("Correlations")
     CHECK(z.get_correlation_coefficients()[0] == Approx(1));
     CHECK(z.get_correlation_coefficients()[1] == Approx(2));
     CHECK(z.get_correlation_coefficients()[2] == Approx(3));
-
-
   }
 
   SECTION("Correlation store")
   {
+    add_id<uncertain<double>> x,y,z;
     correlation_store<double> store;
-    store.add(1, 0.1);
-    store.add(2, 0.2);
 
-    CHECK_THROWS( store.add(2, 0.1) );
+    store.add(x, y, 0.1);
+    store.add(y, z, 0.2);
 
-    CHECK(store.get(1) == Approx(0.1));
-    CHECK(store.get(2) == Approx(0.2));
+    CHECK_THROWS(store.add(x, y, 0.1));
+
+    CHECK(store.get(x, y) == Approx(0.1));
+    CHECK(store.get(y, z) == Approx(0.2));
+
+    auto& global_store = get_global_correlation_store();
+
+    global_store.add(x, y, 0.1);
+    global_store.add(x, z, 0.2);
+
+    CHECK_THROWS(global_store.add(y, x, 0.1));
+
+    CHECK(global_store.get(x, y) == Approx(0.1));
+    CHECK(global_store.get(x, z) == Approx(0.2));
+
+    global_store.set(x,y,0.5);
+    global_store.set(x,z,-0.5);
+    global_store.set(z,y,1);
+
+    CHECK(global_store.get(y,x) == Approx(0.5) );
+    CHECK(global_store.get(z,x) == Approx(-0.5) );
+    CHECK(global_store.get(z,y) == Approx(1) );
 
   }
 
@@ -345,30 +362,48 @@ TEST_CASE("Correlations")
 
       SECTION("Independent")
       {
-      auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](double a, double b) { return a + b; }, x, y);
+        auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](double a, double b) { return a + b; }, x, y);
 
-      double unc = sqrt(0.1*0.1 + 0.2*0.2);
-      CHECK( z_and_correlation.nominal() == Approx(3) );
-      CHECK( z_and_correlation.upper() == Approx(3 + unc) );
-      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
-      CHECK( z_and_correlation.get_correlation_coefficient(0) == Approx( 0.1 / unc) );
-      CHECK( z_and_correlation.get_correlation_coefficient(1) == Approx( 0.2 / unc) );
+        double unc = sqrt(0.1 * 0.1 + 0.2 * 0.2);
+        CHECK(z_and_correlation.nominal() == Approx(3));
+        CHECK(z_and_correlation.upper() == Approx(3 + unc));
+        CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+        CHECK(z_and_correlation.get_correlation_coefficient(0) == Approx(0.1 / unc));
+        CHECK(z_and_correlation.get_correlation_coefficient(1) == Approx(0.2 / unc));
       }
 
-      SECTION("Correlated")
+      SECTION("with Correlation Matrix")
       {
-      correlation_matrix<double> corr(2);
-      corr(0,1) = -1;
+        correlation_matrix<double> corr(2);
+        corr(0, 1) = -1;
 
-      auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](double a, double b) { return a + b; }, corr, x, y);
+        auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](double a, double b) { return a + b; }, corr, x, y);
 
-      double unc = 0.1
-      CHECK( z_and_correlation.nominal() == Approx(3) );
-      CHECK( z_and_correlation.upper() == Approx(3+unc) );
-      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
-      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
-      CHECK( z_and_correlation.get_correlation_coefficient(0) == Approx( (0.1 + 0.2*-1) / unc) );
-      CHECK( z_and_correlation.get_correlation_coefficient(1) == Approx( (0.2 + 0.1*-1) / unc) );
+        double unc = 0.1;
+        CHECK(z_and_correlation.nominal() == Approx(3));
+        CHECK(z_and_correlation.upper() == Approx(3 + unc));
+        CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+        CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+        CHECK(z_and_correlation.get_correlation_coefficient(0) == Approx((0.1 + 0.2 * -1) / unc));
+        CHECK(z_and_correlation.get_correlation_coefficient(1) == Approx((0.2 + 0.1 * -1) / unc));
+      }
+      SECTION("with Correlation Store")
+      {
+        correlation_store<double> cstore;
+        add_id<uncertain<double>> xx;
+        add_id<uncertain<double>> yy;
+        xx = x;
+        yy = y;
+
+        cstore.add(xx, yy, -1);
+
+        auto z = basic_error_propagator::propagate_error([](double a, double b) { return a + b; }, cstore, xx, yy);
+
+        double unc = 0.1;
+        CHECK(z.nominal() == Approx(3));
+        CHECK(z.upper() == Approx(3 + unc));
+        CHECK(cstore.get(z, xx) == Approx((0.1 + 0.2 * -1) / unc));
+        CHECK(cstore.get(z, yy) == Approx((0.2 + 0.1 * -1) / unc));
 
       }
 
@@ -376,23 +411,54 @@ TEST_CASE("Correlations")
 
     SECTION("boost quantities")
     {
-      uncertain<quantity<t::cm>> x(1*i::cm, 0.1*i::cm), y(2*i::cm, 0.2*i::cm);
-      auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](auto a, auto b) { return a * b; }, x, y);
+      uncertain<quantity<t::cm>> x(1 * i::cm, 0.1 * i::cm), y(2 * i::cm, 0.2 * i::cm);
+      SECTION("Independent")
+      {
+        SECTION("Addition")
+        {
+          auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](auto a, auto b) { return a + b; }, x, y);
 
-      double unc = sqrt(0.2*0.2 + 0.2*0.2);
-      CHECK( z_and_correlation.nominal().value() == Approx(2) );
-      CHECK( z_and_correlation.upper().value() == Approx(2 + unc) );
-      CHECK( z_and_correlation.get_correlation_coefficients().size() == 2 );
-      CHECK( z_and_correlation.get_correlation_coefficient(0) == Approx( 0.2 / unc) );
-      CHECK( z_and_correlation.get_correlation_coefficient(1) == Approx( 0.2 / unc) );
+          double unc = sqrt(0.1 * 0.1 + 0.2 * 0.2);
+          CHECK(z_and_correlation.nominal().value() == Approx(3));
+          CHECK(z_and_correlation.upper().value() == Approx(3 + unc));
+          CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+          CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+          CHECK(z_and_correlation.get_correlation_coefficient(0) == Approx(0.1 / unc));
+          CHECK(z_and_correlation.get_correlation_coefficient(1) == Approx(0.2 / unc));
+        }
+
+        SECTION("Multiplyication")
+        {
+          auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](auto a, auto b) { return a * b; }, x, y);
+
+          double unc = sqrt(0.2 * 0.2 + 0.2 * 0.2);
+          CHECK(z_and_correlation.nominal().value() == Approx(2));
+          CHECK(z_and_correlation.upper().value() == Approx(2 + unc));
+          CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+          CHECK(z_and_correlation.get_correlation_coefficient(0) == Approx(0.2 / unc));
+          CHECK(z_and_correlation.get_correlation_coefficient(1) == Approx(0.2 / unc));
+        }
+      }
+      SECTION("with Correlation Matrix")
+      {
+        correlation_matrix<double> corr(2);
+        corr(0, 1) = -1;
+
+        auto z_and_correlation = basic_error_propagator::propagate_error_and_correlation([](auto a, auto b) { return a + b; }, corr, x, y);
+
+        double unc = 0.1;
+        CHECK(z_and_correlation.nominal().value() == Approx(3));
+        CHECK(z_and_correlation.upper().value() == Approx(3 + unc));
+        CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+        CHECK(z_and_correlation.get_correlation_coefficients().size() == 2);
+        CHECK(z_and_correlation.get_correlation_coefficient(0) == Approx((0.1 + 0.2 * -1) / unc));
+        CHECK(z_and_correlation.get_correlation_coefficient(1) == Approx((0.2 + 0.1 * -1) / unc));
+      }
     }
-
-
-
   }
 }
 
-TEST_CASE("Bencharmks","[.][benchmarks]")
+TEST_CASE("Bencharmks", "[.][benchmarks]")
 {
   SECTION("Error Propagation")
   {
@@ -449,29 +515,33 @@ TEST_CASE("id'ed variables")
 {
   SECTION("getting unique ids")
   {
-    CHECK(get_uniq_id() == 1);
-    CHECK(get_uniq_id() == 2);
+    CHECK(get_uniq_id() > 0);
+    CHECK(get_uniq_id() > 1);
   }
 
   SECTION("id'ed uncertain double")
   {
     add_id<uncertain<double>> x;
-    x = uncertain<double>(2,0.2);
-    add_id<uncertain<float>>  y(1,0.1);
+    x = uncertain<double>(2, 0.2);
+    add_id<uncertain<float>>  y(1, 0.1);
     add_id<uncertain<double>> z;
     z = x;
 
-    CHECK( y.get_id() > x.get_id() );
-    CHECK( z.get_id() == x.get_id() );
+    CHECK(y.get_id() > x.get_id());
+    CHECK(z.get_id() == x.get_id());
 
-    CHECK( z.nominal() == Approx(2) );
-    CHECK( z.upper() == Approx(2.2) );
+    CHECK(z.nominal() == Approx(2));
+    CHECK(z.upper() == Approx(2.2));
 
     z.new_id();
-    CHECK( z.get_id() > y.get_id() );
+    CHECK(z.get_id() > y.get_id());
 
-
-
+    CHECK( get_id(x) == x.get_id() );
+    CHECK( get_id(1) == 0 );
+    double u;
+    uncertain<double> v;
+    CHECK( get_id(u) == 0 );
+    CHECK( get_id(v) == 0 );
 
   }
 }
