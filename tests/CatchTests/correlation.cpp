@@ -15,11 +15,29 @@ TEST_CASE("Correlations Utilities")
   SECTION("Correlation matrix")
   {
     correlation_matrix<double> mat(3);
+    CHECK(mat(0, 1) == Approx(0).scale(1));
+    CHECK(mat(1, 0) == Approx(0).scale(1));
+    CHECK(mat(0, 2) == Approx(0).scale(1));
+    CHECK(mat(2, 0) == Approx(0).scale(1));
+    CHECK(mat(0, 3) == Approx(0).scale(1));
+    CHECK(mat(3, 0) == Approx(0).scale(1));
+    CHECK(mat(0, 0) == Approx(1));
+    CHECK(mat(1, 1) == Approx(1));
+    CHECK(mat(2, 2) == Approx(1));
+
     mat(0, 1) = 0.1;
     mat(0, 2) = 0.2;
     mat(1, 2) = 0.3;
 
+    CHECK(mat(0, 1) == Approx(0.1));
     CHECK(mat(1, 0) == Approx(0.1));
+    CHECK(mat(0, 2) == Approx(0.2));
+    CHECK(mat(2, 0) == Approx(0.2));
+    CHECK(mat(0, 3) == Approx(0.3));
+    CHECK(mat(3, 0) == Approx(0.3));
+    CHECK(mat(0, 0) == Approx(1));
+    CHECK(mat(1, 1) == Approx(1));
+    CHECK(mat(2, 2) == Approx(1));
   }
 
   SECTION("Error propagation w/ correlation matrix.")

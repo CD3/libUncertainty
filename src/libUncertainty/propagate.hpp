@@ -2,8 +2,6 @@
 #include <array>
 #include <numeric>
 
-#include <boost/numeric/ublas/vector.hpp>
-
 #include "./correlation.hpp"
 #include "./uncertain.hpp"
 #include "./utils.hpp"
@@ -21,7 +19,7 @@ namespace libUncertainty
    */
 struct basic_error_propagator {
   template<typename T, size_t N>
-  using static_vector = boost::numeric::ublas::fixed_vector<T, N>;
+  using static_vector = std::array<T, N>;
 
   /**
    * Propagate error through a function f.

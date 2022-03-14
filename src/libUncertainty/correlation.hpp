@@ -11,9 +11,6 @@
 #include <iostream>
 #include <map>
 
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
-
 #include "./utils.hpp"
 
 namespace libUncertainty
@@ -24,21 +21,52 @@ namespace libUncertainty
 template<typename T>
 struct correlation_matrix {
  private:
-  using matrix_type = boost::numeric::ublas::triangular_matrix<T, boost::numeric::ublas::upper>;
-  matrix_type m_elements;
+  std::vector<T> m_elements;
+
+  // compute the number of elements that must be stored for an NxN matrix.
+  size_t compute_storage_size(size_t a_N) const { return 1 + a_N * (a_N - 1) / 2; }
+  // compute the size of a matrix (i.e. N in NxN) from the number of elements stored n.
+  size_t compute_matrix_size(size_t a_n) const { return (1 + sqrt(1 + 8 * (a_n - 1))) / 2; }
+  // compute the memory index from matrix index
+  size_t compute_index(size_t a_i, size_t a_j) const
+  {
+    // all diagonal elements should be one, and are stored
+    // in the last element of the vector
+    if(a_i == a_j)
+      return m_elements.size() - 1;
+    return a_i + a_j - 1;
+  }
 
  public:
-  correlation_matrix() = delete;
-  correlation_matrix(size_t N) : m_elements(N, N) {}
-  T  operator()(int i, int j) const { return m_elements(std::min(i, j), std::max(i, j)); }
-  T& operator()(int i, int j) { return m_elements(std::min(i, j), std::max(i, j)); }
+  correlation_matrix() = default;
+  correlation_matrix(size_t a_N) : m_elements(compute_storage_size(a_N))
+  {
+    std::fill(m_elements.begin(), m_elements.end() - 1, static_cast<T>(0));
+    m_elements[m_elements.size() - 1] = static_cast<T>(1);
+  }
+  T operator()(int a_i, int a_j) const
+  {
+    return m_elements[compute_index(a_i, a_j)];
+  }
+  T& operator()(int a_i, int a_j)
+  {
+    return m_elements[compute_index(a_i, a_j)];
+  }
 
   friend std::ostream& operator<<(std::ostream& out, const correlation_matrix<T>& a_mat)
   {
-    out << a_mat.m_elements;
+    size_t N = a_mat.compute_storage_size();
+    out << "(";
+    for(int i = 0; i < N; ++i) {
+      out << "( ";
+      for(int j = 0; j < N; ++j)
+        out << a_mat(i, j) << ", ";
+      out << "), ";
+    }
+    out << "), ";
     return out;
   }
-};
+};  // namespace libUncertainty
 
 /**
  * A container for storing a variable with it's correlation coefficients.
@@ -160,8 +188,7 @@ struct correlation_store {
 /**
  * Returns a reference to a static, global correlation store.
  */
-inline
-correlation_store<double>& get_global_correlation_store()
+inline correlation_store<double>& get_global_correlation_store()
 {
   static correlation_store<double> store;
   return store;
