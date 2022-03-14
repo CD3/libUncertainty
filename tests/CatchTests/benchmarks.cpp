@@ -23,6 +23,14 @@
 using namespace boost::units;
 using namespace libUncertainty;
 
+TEST_CASE("Memory Usage")
+{
+  CHECK( sizeof( uncertain<double> ) == 2*sizeof(double) );
+  CHECK( sizeof( add_id<uncertain<double>> ) == 2*sizeof(double)+sizeof(size_t) );
+  CHECK( sizeof( uncertainties::udouble ) > sizeof(uncertain<double>));
+  CHECK( sizeof( uncertainties::udouble ) > sizeof(add_id<uncertain<double>>));
+}
+
 TEST_CASE("Bencharmks", "[.][benchmarks]")
 {
   SECTION("Error Propagation")
