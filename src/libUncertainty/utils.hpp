@@ -111,5 +111,123 @@ auto get_id(const T& a_var, priority<1>) -> decltype(a_var.get_id())
 }
 
 
+template<typename T>
+bool is_uncertain(const T& a_var)
+{
+  return is_uncertain<T>(priority<2>{});
+}
+
+template<typename T>
+auto is_uncertain(priority<0>) -> decltype(false)
+{
+  return false;
+}
+
+template<typename T>
+auto is_uncertain(priority<1>) -> decltype(std::declval<T>().uncertainty(),true)
+{
+  return true;
+}
+
+
+
+template<typename T>
+auto get_nominal(const T& a_var) -> decltype(get_nominal(a_var,priority<2>{}))
+{
+  return get_nominal(a_var, priority<2>{});
+}
+
+template<typename T>
+auto get_nominal(const T& a_var, priority<0>) -> decltype(a_var)
+{
+  return a_var;
+}
+
+template<typename T>
+auto get_nominal(const T& a_var, priority<1>) -> decltype(a_var.nominal())
+{
+  return a_var.nominal();
+}
+
+
+
+
+template<typename T>
+auto get_uncertainty(const T& a_var) -> decltype(get_uncertainty(a_var,priority<2>{}))
+{
+  return get_uncertainty(a_var, priority<2>{});
+}
+
+template<typename T>
+auto get_uncertainty(const T& a_var, priority<0>) -> decltype(T(0))
+{
+  return T(0);
+}
+
+template<typename T>
+auto get_uncertainty(const T& a_var, priority<1>) -> decltype(a_var.uncertainty())
+{
+  return a_var.uncertainty();
+}
+
+
+template<typename T>
+auto get_upper(const T& a_var) -> decltype(get_upper(a_var,priority<2>{}))
+{
+  return get_upper(a_var, priority<2>{});
+}
+
+template<typename T>
+auto get_upper(const T& a_var, priority<0>) -> decltype(a_var)
+{
+  return a_var;
+}
+
+template<typename T>
+auto get_upper(const T& a_var, priority<1>) -> decltype(a_var.upper())
+{
+  return a_var.upper();
+}
+
+
+template<typename T>
+auto get_lower(const T& a_var) -> decltype(get_lower(a_var,priority<2>{}))
+{
+  return get_lower(a_var, priority<2>{});
+}
+
+template<typename T>
+auto get_lower(const T& a_var, priority<0>) -> decltype(a_var)
+{
+  return a_var;
+}
+
+template<typename T>
+auto get_lower(const T& a_var, priority<1>) -> decltype(a_var.lower())
+{
+  return a_var.lower();
+}
+
+/**
+ * A function for getting "zero" for a given type.
+ */
+template<typename T>
+T zero()
+{
+  return zero<T>(priority<2>{});
+}
+
+template<typename T>
+T zero(priority<0>)
+{
+  return static_cast<T>(0);
+}
+
+template<typename T>
+auto zero(priority<1>) -> decltype( T::from_value(0) )
+{
+  return T::from_value(0);
+}
+
 
 }  // namespace libUncertainty

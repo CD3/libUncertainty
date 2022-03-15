@@ -2,13 +2,13 @@ import copy
 def print_instance(n):
   print("template<typename F, typename T,")
   # need to generate something like:
-  # typename N1, typename U1,
-  # typename N2, typename U2,
-  # typename N3, typename U3,
-  # typename N4, typename U4,
-  # typename N5, typename U5
+  # typename A0,
+  # typename A1,
+  # typename A2,
+  # typename A3,
+  # typename A4
   for i in range(n):
-      line = f"typename N{i}, typename U{i}"
+      line = f"typename A{i}"
       if i < n-1:
           line += ","
       print(line)
@@ -17,32 +17,30 @@ def print_instance(n):
   print("static auto _propagate_error(F a_f,")
   # need to generate something like:
   # std::array<T,5>& a_deviations,
-  # const uncertain<N1,U1>& a_a1,
-  # const uncertain<N2,U2>& a_a2,
-  # const uncertain<N3,U3>& a_a3,
-  # const uncertain<N4,U4>& a_a4,
-  # const uncertain<N5,U5>& a_a5
+  # const A0& a_a0,
+  # const A1& a_a1,
+  # const A2& a_a2,
+  # const A3& a_a3,
+  # const A4& a_a4
   print(f"static_vector<T,{n}>& a_deviations,")
   for i in range(n):
-      line = f"const uncertain<N{i},U{i}>& a_a{i}"
+      line = f"const A{i}& a_a{i}"
       if i < n-1:
           line += ","
       print(line)
   print(")")
   print("{")
   # need to generate something like:
-  # auto nominal    = f(a_a1.nominal() , a_a2.nominal() , a_a3.nominal() , a_a4.nominal() , a_a5.nominal());
-  # a_deviations[0] = f(a_a1.upper()   , a_a2.nominal() , a_a3.nominal() , a_a4.nominal() , a_a5.nominal()) - nominal;
-  # a_deviations[1] = f(a_a1.nominal() , a_a2.upper()   , a_a3.nominal() , a_a4.nominal() , a_a5.nominal()) - nominal;
-  # a_deviations[2] = f(a_a1.nominal() , a_a2.nominal() , a_a3.upper()   , a_a4.nominal() , a_a5.nominal()) - nominal;
-  # a_deviations[3] = f(a_a1.nominal() , a_a2.nominal() , a_a3.nominal() , a_a4.upper()   , a_a5.nominal()) - nominal;
-  # a_deviations[4] = f(a_a1.nominal() , a_a2.nominal() , a_a3.nominal() , a_a4.nominal() , a_a5.upper()  ) - nominal;
-  function_call_args = [f"a_a{i}.nominal()" for i in range(n) ]
+  function_call_args = [f"get_nominal(a_a{i})" for i in range(n) ]
   print('auto nominal = a_f(',', '.join(function_call_args)+');')
   for i in range(n):
-      function_call_args[i] = function_call_args[i].replace('nominal()','upper()')
+      function_call_args[i] = function_call_args[i].replace('nominal','upper')
+      print(f'if( is_uncertain(a_a{i}) ) '+'{')
       print(f'a_deviations[{i}]= a_f(',', '.join(function_call_args)+') - nominal;')
-      function_call_args[i] = function_call_args[i].replace('upper()','nominal()')
+      print("}else{")
+      print(f"a_deviations[{i}] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units")
+      print("}")
+      function_call_args[i] = function_call_args[i].replace('upper','nominal')
   print("return nominal;")
   print("}")
 

@@ -87,4 +87,6 @@ uncertain<NT, UT> make_uncertain(const NT& nom, const UT& unc)
 {
   return uncertain<NT, UT>(nom, unc);
 }
+
+
 }  // namespace libUncertainty

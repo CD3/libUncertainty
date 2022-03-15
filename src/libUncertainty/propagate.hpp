@@ -28,16 +28,16 @@ struct basic_error_propagator {
    */
   template<typename F, typename... Args>
   static auto propagate_error(F a_f, Args... args)
-      -> uncertain<decltype(a_f(args.nominal()...))>
+      -> uncertain<decltype(a_f(get_nominal(args)...))>
   {
     // [1] Need to be careful here. It is possible that the difference between
     // two returned values has a different type than a single return value.
     // For example, if the function returns a type representing a quantity
     // with a unit that has an offset (i.e. temperature in celcius: 100 C - 90 C 10 delta_C \ne 10 C)
-    static_vector<decltype(a_f(args.nominal()...) - a_f(args.upper()...)), sizeof...(Args)> deviations;
+    static_vector<decltype(a_f(get_nominal(args)...) - a_f(get_upper(args)...)), sizeof...(Args)> deviations;
     auto                                                                                    nominal = _propagate_error(a_f, deviations, std::forward<Args>(args)...);
     auto                                                                                    unc     = sqrt(std::inner_product(deviations.begin() + 1, deviations.end(), deviations.begin() + 1, deviations[0] * deviations[0]));
-    uncertain<decltype(a_f(args.nominal()...))>                                             ret(nominal, unc);
+    uncertain<decltype(a_f(get_nominal(args)...))>                                             ret(nominal, unc);
     return ret;
   }
 
@@ -165,802 +165,1682 @@ struct basic_error_propagator {
   }
 
  private:
-  // BEGIN GENERATED CODE
-  // this code was generated using the generate_basic_error_propagator_propagate_error_templates.py script
-  // to delete this code, you can run (in vim) :g/^\s*\/\/ BEGIN GENERATED CODE/,/^\s*\/\/ END GENERATED CODE/ d
-  // to reinsert it, you can run (in vim) :.! python scripts/generate_basic_error_propagator_propagate_error_templates.py
-  // I'm sorry this is so old-school, but your debugger will thank me...
-  template<typename F, typename T,
-           typename N0, typename U0>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 1>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0)
-  {
-    auto nominal    = a_f(a_a0.nominal());
-    a_deviations[0] = a_f(a_a0.upper()) - nominal;
-    return nominal;
-  }
+// BEGIN GENERATED CODE
+// this code was generated using the generate_basic_error_propagator_propagate_error_templates.py script
+// to delete this code, you can run (in vim) :g/^\s*\/\/ BEGIN GENERATED CODE/,/^\s*\/\/ END GENERATED CODE/ d
+// to reinsert it, you can run (in vim) :.! python scripts/generate_basic_error_propagator_propagate_error_templates.py
+// I'm sorry this is so old-school, but your debugger will thank me...
+template<typename F, typename T,
+typename A0
+>
+static auto _propagate_error(F a_f,
+static_vector<T,1>& a_deviations,
+const A0& a_a0
+)
+{
+auto nominal = a_f( get_nominal(a_a0));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 2>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1
+>
+static auto _propagate_error(F a_f,
+static_vector<T,2>& a_deviations,
+const A0& a_a0,
+const A1& a_a1
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 3>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2
+>
+static auto _propagate_error(F a_f,
+static_vector<T,3>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 4>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2,
-                               const uncertain<N3, U3>& a_a3)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal()) - nominal;
-    a_deviations[3] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3
+>
+static auto _propagate_error(F a_f,
+static_vector<T,4>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 5>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2,
-                               const uncertain<N3, U3>& a_a3,
-                               const uncertain<N4, U4>& a_a4)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal()) - nominal;
-    a_deviations[3] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal()) - nominal;
-    a_deviations[4] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4
+>
+static auto _propagate_error(F a_f,
+static_vector<T,5>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 6>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2,
-                               const uncertain<N3, U3>& a_a3,
-                               const uncertain<N4, U4>& a_a4,
-                               const uncertain<N5, U5>& a_a5)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal()) - nominal;
-    a_deviations[3] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal()) - nominal;
-    a_deviations[4] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal()) - nominal;
-    a_deviations[5] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5
+>
+static auto _propagate_error(F a_f,
+static_vector<T,6>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 7>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2,
-                               const uncertain<N3, U3>& a_a3,
-                               const uncertain<N4, U4>& a_a4,
-                               const uncertain<N5, U5>& a_a5,
-                               const uncertain<N6, U6>& a_a6)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal()) - nominal;
-    a_deviations[3] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal()) - nominal;
-    a_deviations[4] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal()) - nominal;
-    a_deviations[5] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal()) - nominal;
-    a_deviations[6] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6
+>
+static auto _propagate_error(F a_f,
+static_vector<T,7>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 8>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2,
-                               const uncertain<N3, U3>& a_a3,
-                               const uncertain<N4, U4>& a_a4,
-                               const uncertain<N5, U5>& a_a5,
-                               const uncertain<N6, U6>& a_a6,
-                               const uncertain<N7, U7>& a_a7)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal()) - nominal;
-    a_deviations[3] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal()) - nominal;
-    a_deviations[4] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal()) - nominal;
-    a_deviations[5] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal()) - nominal;
-    a_deviations[6] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal()) - nominal;
-    a_deviations[7] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7
+>
+static auto _propagate_error(F a_f,
+static_vector<T,8>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 9>&     a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2,
-                               const uncertain<N3, U3>& a_a3,
-                               const uncertain<N4, U4>& a_a4,
-                               const uncertain<N5, U5>& a_a5,
-                               const uncertain<N6, U6>& a_a6,
-                               const uncertain<N7, U7>& a_a7,
-                               const uncertain<N8, U8>& a_a8)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal()) - nominal;
-    a_deviations[3] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal()) - nominal;
-    a_deviations[4] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal()) - nominal;
-    a_deviations[5] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal()) - nominal;
-    a_deviations[6] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal()) - nominal;
-    a_deviations[7] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal()) - nominal;
-    a_deviations[8] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8
+>
+static auto _propagate_error(F a_f,
+static_vector<T,9>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9>
-  static auto _propagate_error(F                        a_f,
-                               static_vector<T, 10>&    a_deviations,
-                               const uncertain<N0, U0>& a_a0,
-                               const uncertain<N1, U1>& a_a1,
-                               const uncertain<N2, U2>& a_a2,
-                               const uncertain<N3, U3>& a_a3,
-                               const uncertain<N4, U4>& a_a4,
-                               const uncertain<N5, U5>& a_a5,
-                               const uncertain<N6, U6>& a_a6,
-                               const uncertain<N7, U7>& a_a7,
-                               const uncertain<N8, U8>& a_a8,
-                               const uncertain<N9, U9>& a_a9)
-  {
-    auto nominal    = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal());
-    a_deviations[0] = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[1] = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[2] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[3] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[4] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[5] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[6] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[7] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal()) - nominal;
-    a_deviations[8] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal()) - nominal;
-    a_deviations[9] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9
+>
+static auto _propagate_error(F a_f,
+static_vector<T,10>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 11>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10
+>
+static auto _propagate_error(F a_f,
+static_vector<T,11>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 12>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11
+>
+static auto _propagate_error(F a_f,
+static_vector<T,12>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 13>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12
+>
+static auto _propagate_error(F a_f,
+static_vector<T,13>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12,
-           typename N13, typename U13>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 14>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12,
-                               const uncertain<N13, U13>& a_a13)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal(), a_a13.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper(), a_a13.nominal()) - nominal;
-    a_deviations[13] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12,
+typename A13
+>
+static auto _propagate_error(F a_f,
+static_vector<T,14>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12,
+const A13& a_a13
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12), get_nominal(a_a13)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a13) ) {
+a_deviations[13]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_upper(a_a13)) - nominal;
+}else{
+a_deviations[13] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12,
-           typename N13, typename U13,
-           typename N14, typename U14>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 15>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12,
-                               const uncertain<N13, U13>& a_a13,
-                               const uncertain<N14, U14>& a_a14)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper(), a_a13.nominal(), a_a14.nominal()) - nominal;
-    a_deviations[13] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.upper(), a_a14.nominal()) - nominal;
-    a_deviations[14] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12,
+typename A13,
+typename A14
+>
+static auto _propagate_error(F a_f,
+static_vector<T,15>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12,
+const A13& a_a13,
+const A14& a_a14
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12), get_nominal(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a13) ) {
+a_deviations[13]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_upper(a_a13), get_nominal(a_a14)) - nominal;
+}else{
+a_deviations[13] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a14) ) {
+a_deviations[14]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_upper(a_a14)) - nominal;
+}else{
+a_deviations[14] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12,
-           typename N13, typename U13,
-           typename N14, typename U14,
-           typename N15, typename U15>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 16>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12,
-                               const uncertain<N13, U13>& a_a13,
-                               const uncertain<N14, U14>& a_a14,
-                               const uncertain<N15, U15>& a_a15)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[13] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.upper(), a_a14.nominal(), a_a15.nominal()) - nominal;
-    a_deviations[14] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.upper(), a_a15.nominal()) - nominal;
-    a_deviations[15] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12,
+typename A13,
+typename A14,
+typename A15
+>
+static auto _propagate_error(F a_f,
+static_vector<T,16>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12,
+const A13& a_a13,
+const A14& a_a14,
+const A15& a_a15
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a13) ) {
+a_deviations[13]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_upper(a_a13), get_nominal(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[13] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a14) ) {
+a_deviations[14]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_upper(a_a14), get_nominal(a_a15)) - nominal;
+}else{
+a_deviations[14] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a15) ) {
+a_deviations[15]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_upper(a_a15)) - nominal;
+}else{
+a_deviations[15] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12,
-           typename N13, typename U13,
-           typename N14, typename U14,
-           typename N15, typename U15,
-           typename N16, typename U16>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 17>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12,
-                               const uncertain<N13, U13>& a_a13,
-                               const uncertain<N14, U14>& a_a14,
-                               const uncertain<N15, U15>& a_a15,
-                               const uncertain<N16, U16>& a_a16)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[13] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.upper(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[14] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.upper(), a_a15.nominal(), a_a16.nominal()) - nominal;
-    a_deviations[15] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.upper(), a_a16.nominal()) - nominal;
-    a_deviations[16] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12,
+typename A13,
+typename A14,
+typename A15,
+typename A16
+>
+static auto _propagate_error(F a_f,
+static_vector<T,17>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12,
+const A13& a_a13,
+const A14& a_a14,
+const A15& a_a15,
+const A16& a_a16
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a13) ) {
+a_deviations[13]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_upper(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[13] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a14) ) {
+a_deviations[14]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_upper(a_a14), get_nominal(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[14] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a15) ) {
+a_deviations[15]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_upper(a_a15), get_nominal(a_a16)) - nominal;
+}else{
+a_deviations[15] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a16) ) {
+a_deviations[16]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_upper(a_a16)) - nominal;
+}else{
+a_deviations[16] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12,
-           typename N13, typename U13,
-           typename N14, typename U14,
-           typename N15, typename U15,
-           typename N16, typename U16,
-           typename N17, typename U17>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 18>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12,
-                               const uncertain<N13, U13>& a_a13,
-                               const uncertain<N14, U14>& a_a14,
-                               const uncertain<N15, U15>& a_a15,
-                               const uncertain<N16, U16>& a_a16,
-                               const uncertain<N17, U17>& a_a17)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[13] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.upper(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[14] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.upper(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[15] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.upper(), a_a16.nominal(), a_a17.nominal()) - nominal;
-    a_deviations[16] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.upper(), a_a17.nominal()) - nominal;
-    a_deviations[17] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12,
+typename A13,
+typename A14,
+typename A15,
+typename A16,
+typename A17
+>
+static auto _propagate_error(F a_f,
+static_vector<T,18>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12,
+const A13& a_a13,
+const A14& a_a14,
+const A15& a_a15,
+const A16& a_a16,
+const A17& a_a17
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a13) ) {
+a_deviations[13]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_upper(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[13] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a14) ) {
+a_deviations[14]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_upper(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[14] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a15) ) {
+a_deviations[15]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_upper(a_a15), get_nominal(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[15] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a16) ) {
+a_deviations[16]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_upper(a_a16), get_nominal(a_a17)) - nominal;
+}else{
+a_deviations[16] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a17) ) {
+a_deviations[17]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_upper(a_a17)) - nominal;
+}else{
+a_deviations[17] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12,
-           typename N13, typename U13,
-           typename N14, typename U14,
-           typename N15, typename U15,
-           typename N16, typename U16,
-           typename N17, typename U17,
-           typename N18, typename U18>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 19>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12,
-                               const uncertain<N13, U13>& a_a13,
-                               const uncertain<N14, U14>& a_a14,
-                               const uncertain<N15, U15>& a_a15,
-                               const uncertain<N16, U16>& a_a16,
-                               const uncertain<N17, U17>& a_a17,
-                               const uncertain<N18, U18>& a_a18)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[13] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.upper(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[14] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.upper(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[15] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.upper(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[16] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.upper(), a_a17.nominal(), a_a18.nominal()) - nominal;
-    a_deviations[17] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.upper(), a_a18.nominal()) - nominal;
-    a_deviations[18] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12,
+typename A13,
+typename A14,
+typename A15,
+typename A16,
+typename A17,
+typename A18
+>
+static auto _propagate_error(F a_f,
+static_vector<T,19>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12,
+const A13& a_a13,
+const A14& a_a14,
+const A15& a_a15,
+const A16& a_a16,
+const A17& a_a17,
+const A18& a_a18
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a13) ) {
+a_deviations[13]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_upper(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[13] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a14) ) {
+a_deviations[14]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_upper(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[14] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a15) ) {
+a_deviations[15]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_upper(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[15] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a16) ) {
+a_deviations[16]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_upper(a_a16), get_nominal(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[16] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a17) ) {
+a_deviations[17]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_upper(a_a17), get_nominal(a_a18)) - nominal;
+}else{
+a_deviations[17] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a18) ) {
+a_deviations[18]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_upper(a_a18)) - nominal;
+}else{
+a_deviations[18] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  template<typename F, typename T,
-           typename N0, typename U0,
-           typename N1, typename U1,
-           typename N2, typename U2,
-           typename N3, typename U3,
-           typename N4, typename U4,
-           typename N5, typename U5,
-           typename N6, typename U6,
-           typename N7, typename U7,
-           typename N8, typename U8,
-           typename N9, typename U9,
-           typename N10, typename U10,
-           typename N11, typename U11,
-           typename N12, typename U12,
-           typename N13, typename U13,
-           typename N14, typename U14,
-           typename N15, typename U15,
-           typename N16, typename U16,
-           typename N17, typename U17,
-           typename N18, typename U18,
-           typename N19, typename U19>
-  static auto _propagate_error(F                          a_f,
-                               static_vector<T, 20>&      a_deviations,
-                               const uncertain<N0, U0>&   a_a0,
-                               const uncertain<N1, U1>&   a_a1,
-                               const uncertain<N2, U2>&   a_a2,
-                               const uncertain<N3, U3>&   a_a3,
-                               const uncertain<N4, U4>&   a_a4,
-                               const uncertain<N5, U5>&   a_a5,
-                               const uncertain<N6, U6>&   a_a6,
-                               const uncertain<N7, U7>&   a_a7,
-                               const uncertain<N8, U8>&   a_a8,
-                               const uncertain<N9, U9>&   a_a9,
-                               const uncertain<N10, U10>& a_a10,
-                               const uncertain<N11, U11>& a_a11,
-                               const uncertain<N12, U12>& a_a12,
-                               const uncertain<N13, U13>& a_a13,
-                               const uncertain<N14, U14>& a_a14,
-                               const uncertain<N15, U15>& a_a15,
-                               const uncertain<N16, U16>& a_a16,
-                               const uncertain<N17, U17>& a_a17,
-                               const uncertain<N18, U18>& a_a18,
-                               const uncertain<N19, U19>& a_a19)
-  {
-    auto nominal     = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal());
-    a_deviations[0]  = a_f(a_a0.upper(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[1]  = a_f(a_a0.nominal(), a_a1.upper(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[2]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.upper(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[3]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.upper(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[4]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.upper(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[5]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.upper(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[6]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.upper(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[7]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.upper(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[8]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.upper(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[9]  = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.upper(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[10] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.upper(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[11] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.upper(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[12] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.upper(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[13] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.upper(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[14] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.upper(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[15] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.upper(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[16] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.upper(), a_a17.nominal(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[17] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.upper(), a_a18.nominal(), a_a19.nominal()) - nominal;
-    a_deviations[18] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.upper(), a_a19.nominal()) - nominal;
-    a_deviations[19] = a_f(a_a0.nominal(), a_a1.nominal(), a_a2.nominal(), a_a3.nominal(), a_a4.nominal(), a_a5.nominal(), a_a6.nominal(), a_a7.nominal(), a_a8.nominal(), a_a9.nominal(), a_a10.nominal(), a_a11.nominal(), a_a12.nominal(), a_a13.nominal(), a_a14.nominal(), a_a15.nominal(), a_a16.nominal(), a_a17.nominal(), a_a18.nominal(), a_a19.upper()) - nominal;
-    return nominal;
-  }
+template<typename F, typename T,
+typename A0,
+typename A1,
+typename A2,
+typename A3,
+typename A4,
+typename A5,
+typename A6,
+typename A7,
+typename A8,
+typename A9,
+typename A10,
+typename A11,
+typename A12,
+typename A13,
+typename A14,
+typename A15,
+typename A16,
+typename A17,
+typename A18,
+typename A19
+>
+static auto _propagate_error(F a_f,
+static_vector<T,20>& a_deviations,
+const A0& a_a0,
+const A1& a_a1,
+const A2& a_a2,
+const A3& a_a3,
+const A4& a_a4,
+const A5& a_a5,
+const A6& a_a6,
+const A7& a_a7,
+const A8& a_a8,
+const A9& a_a9,
+const A10& a_a10,
+const A11& a_a11,
+const A12& a_a12,
+const A13& a_a13,
+const A14& a_a14,
+const A15& a_a15,
+const A16& a_a16,
+const A17& a_a17,
+const A18& a_a18,
+const A19& a_a19
+)
+{
+auto nominal = a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19));
+if( is_uncertain(a_a0) ) {
+a_deviations[0]= a_f( get_upper(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[0] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a1) ) {
+a_deviations[1]= a_f( get_nominal(a_a0), get_upper(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[1] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a2) ) {
+a_deviations[2]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_upper(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[2] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a3) ) {
+a_deviations[3]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_upper(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[3] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a4) ) {
+a_deviations[4]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_upper(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[4] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a5) ) {
+a_deviations[5]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_upper(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[5] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a6) ) {
+a_deviations[6]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_upper(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[6] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a7) ) {
+a_deviations[7]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_upper(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[7] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a8) ) {
+a_deviations[8]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_upper(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[8] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a9) ) {
+a_deviations[9]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_upper(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[9] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a10) ) {
+a_deviations[10]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_upper(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[10] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a11) ) {
+a_deviations[11]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_upper(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[11] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a12) ) {
+a_deviations[12]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_upper(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[12] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a13) ) {
+a_deviations[13]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_upper(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[13] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a14) ) {
+a_deviations[14]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_upper(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[14] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a15) ) {
+a_deviations[15]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_upper(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[15] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a16) ) {
+a_deviations[16]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_upper(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[16] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a17) ) {
+a_deviations[17]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_upper(a_a17), get_nominal(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[17] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a18) ) {
+a_deviations[18]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_upper(a_a18), get_nominal(a_a19)) - nominal;
+}else{
+a_deviations[18] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+if( is_uncertain(a_a19) ) {
+a_deviations[19]= a_f( get_nominal(a_a0), get_nominal(a_a1), get_nominal(a_a2), get_nominal(a_a3), get_nominal(a_a4), get_nominal(a_a5), get_nominal(a_a6), get_nominal(a_a7), get_nominal(a_a8), get_nominal(a_a9), get_nominal(a_a10), get_nominal(a_a11), get_nominal(a_a12), get_nominal(a_a13), get_nominal(a_a14), get_nominal(a_a15), get_nominal(a_a16), get_nominal(a_a17), get_nominal(a_a18), get_upper(a_a19)) - nominal;
+}else{
+a_deviations[19] = nominal - nominal; // can't just use 0 here, we might be dealing with quantities that have units
+}
+return nominal;
+}
 
-  // END GENERATED CODE
+// END GENERATED CODE
 };
 
 }  // namespace libUncertainty

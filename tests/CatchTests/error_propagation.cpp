@@ -6,9 +6,8 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/type_traits/function_traits.hpp>
 
-#include <libUncertainty/uncertain.hpp>
 #include <libUncertainty/propagate.hpp>
-
+#include <libUncertainty/uncertain.hpp>
 
 using namespace boost::units;
 using namespace libUncertainty;
@@ -83,6 +82,54 @@ TEST_CASE("Error Propagation Tests")
           CHECK(quantity<t::mm_p2>(A.uncertainty()).value() == Approx(56.56854));
         }
       }
+    }
+  }
+  SECTION("Mixing uncertain with exact quantities")
+  {
+    SECTION("doubles")
+    {
+      double            x = 2;
+      uncertain<double> y(2, 0.1);
+
+      auto L = basic_error_propagator::propagate_error([](double a, double b) { return a + b; }, x, y);
+
+      CHECK(L.nominal() == Approx(4));
+      CHECK(L.uncertainty() == Approx(0.1));
+    }
+    SECTION("Lots of args")
+    {
+      auto L = basic_error_propagator::propagate_error([](double a, double b, double c, double d, double e, double f, double g) { return a + b + c + d + e + f + g; },
+                                                       uncertain<double>{1, 0.1},
+                                                       uncertain<double>{2, 0.2},
+                                                       uncertain<double>{3, 0.3},
+                                                       uncertain<double>{4, 0.4},
+                                                       uncertain<double>{5, 0.5},
+                                                       uncertain<double>{6, 0.6},
+                                                       uncertain<double>{7, 0.7});
+
+      CHECK(L.nominal() == Approx(28));
+      CHECK(L.uncertainty() == Approx(1.1832159566));
+
+      L = basic_error_propagator::propagate_error([](double a, double b, double c, double d, double e, double f, double g) { return a + b + c + d + e + f + g; },
+                                                  1, uncertain<double>{2, 0.2}, 3, 4, 5, 6, 7);
+
+      CHECK(L.nominal() == Approx(28));
+      CHECK(L.uncertainty() == Approx(0.2));
+    }
+
+    SECTION("quantities")
+    {
+      auto h = make_uncertain(1.5*i::m, 1*i::cm);
+      auto t = make_uncertain(0.562*i::s, 19*i::ms);
+
+      auto f = [](quantity<t::m> h, quantity<t::s> t){ return 2*h/t/t; };
+
+      auto g = basic_error_propagator::propagate_error(f, h, t);
+
+      g = g.normalize();
+      CHECK( g.nominal().value() == Approx(9.5) );
+      CHECK( g.uncertainty().value() == Approx(0.6) );
+
     }
   }
 }

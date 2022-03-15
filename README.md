@@ -7,6 +7,9 @@ that provides some _basic_ utilities for working with uncertain quantities, incl
 It was written with [Boost.Units](https://www.boost.org/doc/libs/1_78_0/doc/html/boost_units.html) in mind, so
 it supports uncertain quantities with units.
 
+It is not sophisticated as libraries like [UQtk](https://github.com/sandialabs/UQTk) or as clean to use as libraries like [uncertainties-cpp](https://www.giacomopetrillo.com/software/uncertainties-cpp/doc/html/), but
+it is small, simple, and easy to integrate.
+
 ## Features
 
 - Simple: the `uncertain<...>` class template is a thin wrapper around `std::pair<...>`.
@@ -19,6 +22,10 @@ it supports uncertain quantities with units.
   quantities (variables with units) as arguments.
 - Non-intrusive: the library will propagate error through *arbitrary* functions, no special implementations or modification are necessary. Just create `uncertain<...>` variables and propagate
   error through your code.
+
+**Non-Features**
+
+- The library does not do any sort of automatic differentiation to automatically propagate error through expressions. Any calculation that you want to propagate error through must be wrapped in a function, which may be lambda.
 
 
 
