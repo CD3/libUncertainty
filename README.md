@@ -23,11 +23,50 @@ it is small, simple, and easy to integrate.
 - Non-intrusive: the library will propagate error through *arbitrary* functions, no special implementations or modification are necessary. Just create `uncertain<...>` variables and propagate
   error through your code.
 
-**Non-Features**
+**Example**
 
-- The library does not do any sort of automatic differentiation to automatically propagate error through expressions. Any calculation that you want to propagate error through must be wrapped in a function, which may be lambda.
+Consider a simple ball-drop experiment to measure the acceleration of gravity. A ball bearing is dropped from a height of 1.5 m ten times, and the time it takes to reach the floor is measured.
+```
+#include <vector>
+#include <BoostUnitDefinitions/Units.hpp>
+#include <libUncertainty/uncertain.hpp>
+#include <libUncertainty/propagate.hpp>
 
+using namespace boost::units;
+using namespace libUncertainty
 
+int main()
+{
+    std::vector<quantity<t::s>> time_data {
+        0.431*i::s
+      , 0.603*i::s
+      , 0.504*i::s
+      , 0.581*i::s
+      , 0.588*i::s
+      , 0.644*i::s
+      , 0.595*i::s
+      , 0.534*i::s
+      , 0.563*i::s
+      , 0.578*i::s
+      };
+
+    auto time_measurement = make_uncertain(time_data.begin(), time_data.end());
+    auto height_measurement = make_uncertain( 1.5*i::m, 1*i::cm );
+
+    auto calc_gravity = [](quantity<t::m> h, quantity<t::s> t) { return 2*h/t/t; };
+
+    auto g = basic_error_propagator::propagate_error( calc_gravity, height_measurement, time_measurement );
+    g = g.normalize();
+
+    std::cout << "Measured g: " << g << std::endl;
+    std::cout << "z-score: " << z_score( g, 9.81*i::m/i::s/i::s ) << std::endl;
+}
+
+// Output:
+// Measured g: 9.5 m s^-2 +/- 0.6 m s^-2
+// z-score: 0.516667
+```
+Based on the z-score (it's less than 2), we can say that the measured value is "consistent" with the accepted value.
 
 ## Installation
 

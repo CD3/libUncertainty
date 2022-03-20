@@ -92,6 +92,28 @@ class add_id : public BASE
 template<unsigned P> struct priority: priority<P-1> {};
 template<> struct priority<0> {};
 
+/**
+ * A function for getting "zero" for a given type.
+ */
+template<typename T>
+T zero()
+{
+  return zero<T>(priority<2>{});
+}
+
+template<typename T>
+T zero(priority<0>)
+{
+  return static_cast<T>(0);
+}
+
+template<typename T>
+auto zero(priority<1>) -> decltype( T::from_value(0) )
+{
+  return T::from_value(0);
+}
+
+
 template<typename T>
 size_t get_id(const T& a_var)
 {
@@ -112,18 +134,21 @@ auto get_id(const T& a_var, priority<1>) -> decltype(a_var.get_id())
 
 
 template<typename T>
+constexpr
 bool is_uncertain(const T& a_var)
 {
   return is_uncertain<T>(priority<2>{});
 }
 
 template<typename T>
+constexpr
 auto is_uncertain(priority<0>) -> decltype(false)
 {
   return false;
 }
 
 template<typename T>
+constexpr
 auto is_uncertain(priority<1>) -> decltype(std::declval<T>().uncertainty(),true)
 {
   return true;
@@ -159,9 +184,9 @@ auto get_uncertainty(const T& a_var) -> decltype(get_uncertainty(a_var,priority<
 }
 
 template<typename T>
-auto get_uncertainty(const T& a_var, priority<0>) -> decltype(T(0))
+auto get_uncertainty(const T& a_var, priority<0>) -> decltype(zero<T>())
 {
-  return T(0);
+  return zero<T>();
 }
 
 template<typename T>
@@ -206,27 +231,6 @@ template<typename T>
 auto get_lower(const T& a_var, priority<1>) -> decltype(a_var.lower())
 {
   return a_var.lower();
-}
-
-/**
- * A function for getting "zero" for a given type.
- */
-template<typename T>
-T zero()
-{
-  return zero<T>(priority<2>{});
-}
-
-template<typename T>
-T zero(priority<0>)
-{
-  return static_cast<T>(0);
-}
-
-template<typename T>
-auto zero(priority<1>) -> decltype( T::from_value(0) )
-{
-  return T::from_value(0);
 }
 
 

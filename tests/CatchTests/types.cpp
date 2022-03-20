@@ -157,4 +157,20 @@ TEST_CASE("uncertain<...> tests")
       }
     }
   }
+  SECTION("make_uncertain with data")
+  {
+    SECTION("doubles")
+    {
+      std::vector<double> vals{0.431, 0.603, 0.504, 0.581, 0.588, 0.644, 0.595, 0.534, 0.563, 0.578};
+
+      auto t = make_uncertain(vals.begin(), vals.end());
+      CHECK( t.nominal() == Approx(0.5620999999999999) );
+      CHECK( t.uncertainty() == Approx(0.059718692402146764/sqrt(10)) );
+
+      t = make_uncertain(vals.begin(), vals.end(), tags::use_stdev_for_error{});
+      CHECK( t.nominal() == Approx(0.5620999999999999) );
+      CHECK( t.uncertainty() == Approx(0.059718692402146764) );
+    }
+
+  }
 }

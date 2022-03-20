@@ -6,13 +6,15 @@
 #include <type_traits>
 #include <utility>
 
+#include "./statistics.hpp"
 #include "./utils.hpp"
+#include "./tags.hpp"
 
 /** @file uncertain.hpp
-  * @brief The uncertain class
-  * @author C.D. Clark III
-  * @date 03/05/22
-  */
+ * @brief The uncertain class
+ * @author C.D. Clark III
+ * @date 03/05/22
+ */
 
 namespace libUncertainty
 {
@@ -76,17 +78,56 @@ class uncertain
   std::pair<nominal_type, uncertainty_type> m_storage;
 };
 
+template<typename T>
+auto make_uncertain(const T& a_arg)
+-> decltype(make_uncertain(a_arg, priority<2>{}))
+{
+  return make_uncertain(a_arg, priority<2>{});
+}
+
+template<typename T1, typename T2>
+auto make_uncertain(const T1& a_arg1, const T2& a_arg2)
+-> decltype(make_uncertain(a_arg1, a_arg2, priority<2>{}))
+{
+  return make_uncertain(a_arg1, a_arg2, priority<2>{});
+}
+
 template<typename NT>
-uncertain<NT> make_uncertain(const NT& nom)
+uncertain<NT> make_uncertain(const NT& nom, priority<0>)
 {
   return uncertain<NT>(nom);
 }
 
 template<typename NT, typename UT>
-uncertain<NT, UT> make_uncertain(const NT& nom, const UT& unc)
+uncertain<NT, UT> make_uncertain(const NT& nom, const UT& unc, priority<0>)
 {
   return uncertain<NT, UT>(nom, unc);
 }
 
+/**
+ * Make an uncertain value from a sequance of values using the standard error of the mean for the uncertainty.
+ */
+template<typename iterator>
+auto make_uncertain(iterator begin, iterator end, priority<1>)
+-> decltype(make_uncertain(average(begin, end), standard_error_of_the_mean(begin, end), priority<0>{}))
+{
+  return make_uncertain(average(begin, end), standard_error_of_the_mean(begin, end),priority<0>{});
+}
+
+/**
+ * Make an uncertain value from a sequence of values. This overload uses the standard deviation
+ * for the uncertainty.
+ *
+ * @param begin Iterator pointing to beginning of sequence.
+ * @param end Iterator pointing to end of sequence.
+ * @param tag instance of tags::use_stdev_for_error used to select this overload. To use, pass `tags::use_stdev_for_error{}` as the third argument.
+ * @param degrees_of_freedom_reduction Reduce the number of degrees of freedom when computing the standard deviation. Default is 1.
+ */
+template<typename iterator>
+auto make_uncertain(iterator begin, iterator end, tags::use_stdev_for_error tag, size_t degrees_of_freedom_reduction = 1)
+-> decltype(make_uncertain(average(begin, end), standard_deviation(begin, end, degrees_of_freedom_reduction), priority<0>{}))
+{
+  return make_uncertain(average(begin, end), standard_deviation(begin, end),priority<0>{});
+}
 
 }  // namespace libUncertainty

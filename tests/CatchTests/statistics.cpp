@@ -32,6 +32,9 @@ TEST_CASE("Builtin statistic calculation tests")
       std = standard_deviation(vals.begin(), vals.end(),0);
       CHECK( std == Approx(0.05665412606333275) );
 
+      double err = standard_error_of_the_mean(vals.begin(), vals.end());
+      CHECK( err == Approx(0.059718692402146764/sqrt(10)) );
+
     }
     SECTION("quantities")
     {
