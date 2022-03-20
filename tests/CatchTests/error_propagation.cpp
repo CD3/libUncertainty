@@ -132,4 +132,34 @@ TEST_CASE("Error Propagation Tests")
 
     }
   }
+
+  SECTION("Test that 1 - 20 arguments compile")
+  {
+
+    uncertain<double> m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14,m15,m16,m17,m18,m19,m20;
+
+    uncertain<double> r;
+
+    r = basic_error_propagator::propagate_error( [](double a1){return a1;}, m1 );
+    r = basic_error_propagator::propagate_error( [](double a1, double a2){return a1;}, m1, m2 );
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3){return a1;}, m1, m2, m3 );
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4){return a1;}, m1, m2, m3, m4 );
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5){return a1;}, m1, m2, m3, m4, m5  );
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6){return a1;}, m1, m2, m3, m4, m5, m6);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7){return a1;}, m1, m2, m3, m4, m5, m6, m7);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13, double a14){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13, double a14, double a15){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13, double a14, double a15, double a16){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13, double a14, double a15, double a16, double a17){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16, m17);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13, double a14, double a15, double a16, double a17, double a18){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16, m17, m18);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13, double a14, double a15, double a16, double a17, double a18, double a19){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16, m17, m18, m19);
+    r = basic_error_propagator::propagate_error( [](double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10, double a11, double a12, double a13, double a14, double a15, double a16, double a17, double a18, double a19, double a20){return a1;}, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16, m17, m18, m19, m20 );
+
+  }
 }
