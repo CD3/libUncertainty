@@ -57,6 +57,17 @@ class uncertain
     return out;
   }
 
+  friend std::istream& operator>>(std::istream& in, uncertain<nominal_type, uncertainty_type>& a_val)
+  {
+    std::string tmp;
+    nominal_type nom;
+    uncertainty_type unc;
+    in >> nom >> tmp >> unc;
+    a_val.nominal(nom);
+    a_val.uncertainty(unc);
+    return in;
+  }
+
   this_type normalize(size_t n = 1) const
   {
     uncertainty_type unc = sigfig_round(this->uncertainty(), n);

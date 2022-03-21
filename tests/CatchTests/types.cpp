@@ -9,6 +9,8 @@
 using namespace boost::units;
 using namespace libUncertainty;
 
+struct my_type {};
+
 TEST_CASE("uncertain<...> tests")
 {
   SECTION("Constructing uncertain<...> variables")
@@ -88,6 +90,21 @@ TEST_CASE("uncertain<...> tests")
     out << x;
 
     CHECK(out.str() == "10 +/- 2");
+  }
+
+  SECTION("iostream input")
+  {
+    SECTION("int")
+    {
+      uncertain<int> x;
+      std::stringstream in("10 +/- 2");
+
+      in >> x;
+
+      CHECK( x.nominal() == 10 );
+      CHECK( x.uncertainty() == 2 );
+    }
+
   }
 
   SECTION("Normalization")
