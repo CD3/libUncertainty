@@ -7,14 +7,14 @@ that provides some _basic_ utilities for working with uncertain quantities, incl
 It was written with [Boost.Units](https://www.boost.org/doc/libs/1_78_0/doc/html/boost_units.html) in mind, so
 it supports uncertain quantities with units.
 
-It is not sophisticated as libraries like [UQtk](https://github.com/sandialabs/UQTk) or as clean to use as libraries like [uncertainties-cpp](https://www.giacomopetrillo.com/software/uncertainties-cpp/doc/html/), but
+It is not as sophisticated as libraries like [UQtk](https://github.com/sandialabs/UQTk) or as clean to use as libraries like [uncertainties-cpp](https://www.giacomopetrillo.com/software/uncertainties-cpp/doc/html/), but
 it is small, simple, and easy to integrate.
 
 ## Features
 
 - Simple: the `uncertain<...>` class template is a thin wrapper around `std::pair<...>`.
 - Piecemeal adoptions: you can just use the `uncertain<...>` class template to track uncertainty using your own methods, use the error propagation functions
-  to propagate error with or with or without correlations, or use the
+  to propagate error with or without correlations, or use the
   correlation store to automatically track correlations between uncertain
   variables. Getting started is easy, and you don't have to commit to a new
   framework. Use it where it makes sense.
@@ -211,7 +211,7 @@ z.nominal();     // 7
 z.uncertainty(); // 0.1
 ```
 
-The correlation matrix is a square, symmetric matrix with whose elements give the correlation between arguments (the element (0,1) gives the correlation coefficient between the first and second arguments).
+The correlation matrix is a square, symmetric matrix whose elements give the correlation between arguments (the element (0,1) gives the correlation coefficient between the first and second arguments).
 Since any variable is exactly correlated with itself, the diagonal elements of the correlation matrix will be one. The `correlation_matrix<...>` class template is a simple container for creating correlation matrices.
 You only need to tell it the size, and then set the non-diagonal elements in the upper (or lower) half. You can also use your own matrix container, the error propagator will only call `::operator()(int,int)` on the container.
 
