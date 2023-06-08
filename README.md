@@ -223,7 +223,7 @@ The correlation matrix is a simple way to specify the correlation of inputs for 
 then the correlation between `x` and `y` can be specified in a 2 x 2 matrix. If we then did another calculation involving all three variables, we would need a 3 x 3 matrix to specify the correlation. We would also have
 to be careful and ensure that the rows and columns of the matrix matches the argument number of each function we propagate error through.
 
-libUncertainty provides provides a simple framework to help. To *automatically* tracking correlations between uncertain quantities, you can create a "correlation store", which is a container that stores the correlation between
+libUncertainty provides a simple framework to help. To *automatically* track correlations between uncertain quantities, you can create a "correlation store", which is a container that stores the correlation between
 pairs of uncertain variables. However, the plain `uncertain<...>` variables used in the previous examples will not work with a correlation store, we have to add an id.
 ```
 correlation_store<double> store;
