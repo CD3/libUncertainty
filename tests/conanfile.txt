@@ -1,6 +1,7 @@
 [requires]
-boost/1.72.0
-BoostUnitDefinitions/0.2@cd3/devel
+boost/1.80.0
+cd3-boost-unit-definitions/0.2.2
 uncertainties-cpp/0.0.1
 [generators]
-cmake
+CMakeDeps
+CMakeToolchain

@@ -1,13 +1,16 @@
 cmake_minimum_required( VERSION 3.1 )
 
+project(libUncertainty-Tests)
 enable_testing()
 
 set( binDir ${CMAKE_BINARY_DIR}/testBin )
 set( buildDir ${CMAKE_BINARY_DIR} )
 
+add_subdirectory(.. libUncertainty)
 
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/catch)
+find_package(Boost REQUIRED)
+find_package(BoostUnitDefinitions REQUIRED)
+find_package(uncertainties-cpp REQUIRED)
 
 if( NOT TARGET libUncertainty )
   add_subdirectory(.. libUncertainty)
@@ -27,13 +30,13 @@ if( EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake" )
   conan_basic_setup(TARGETS)
 endif()
 
-set( testName ${PROJECT_NAME}_CatchTests )
+set( testName libUncertainty_CatchTests )
 add_executable(${testName} ${unitTest_SOURCES})
 target_compile_definitions( ${testName} PRIVATE -DTESTING )
-target_link_libraries(${testName} Catch libUncertainty
-                        $<$<TARGET_EXISTS:CONAN_PKG::boost>:CONAN_PKG::boost>
-                        $<$<TARGET_EXISTS:CONAN_PKG::BoostUnitDefinitions>:CONAN_PKG::BoostUnitDefinitions>
-                        $<$<TARGET_EXISTS:CONAN_PKG::uncertainties-cpp>:CONAN_PKG::uncertainties-cpp>
+target_link_libraries(${testName} PUBLIC libUncertainty
+  Boost::headers
+  BoostUnitDefinitions::BoostUnitDefinitions
+  uncertainties-cpp::uncertainties-cpp
   )
 target_include_directories( ${testName} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 set_target_properties(${testName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${binDir})
