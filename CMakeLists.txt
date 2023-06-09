@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 
-project(libUncertainty VERSION 0.1.1)
+project(libUncertainty VERSION 0.2)
 
 if(TARGET libUncertainty)
   return()
