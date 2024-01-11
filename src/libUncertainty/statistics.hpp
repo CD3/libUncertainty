@@ -1,25 +1,26 @@
 #pragma once
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 
 #include "./utils.hpp"
 
 /** @file statistics.hpp
-  * @brief 
-  * @author C.D. Clark III
-  * @date 03/15/22
-  */
+ * @brief
+ * @author C.D. Clark III
+ * @date 03/15/22
+ */
 
 namespace libUncertainty
 {
 /**
-   * @brief Computes the average of a sample.
-   *
-   * Works with Boost.Units quantities
-   *
-   * @param begin iterator pointing to beginning of range.
-   * @param end iterator pointing to end of range.
-   */
+ * @brief Computes the average of a sample.
+ *
+ * Works with Boost.Units quantities
+ *
+ * @param begin iterator pointing to beginning of range.
+ * @param end iterator pointing to end of range.
+ */
 template<typename iterator>
 auto average(iterator begin, iterator end)
     -> decltype(zero<typename std::iterator_traits<iterator>::value_type>())
@@ -33,8 +34,8 @@ auto average(iterator begin, iterator end)
 
 /**
  * @brief Computes the variance of a sample (the average of the deviations squared).
-   *
-   * Works with Boost.Units quantities
+ *
+ * Works with Boost.Units quantities
  *
  * @param begin iterator pointing to beginning of range.
  * @param end iterator pointing to end of range.
@@ -97,7 +98,7 @@ double z_score(const T1& a_a, const T2& a_b)
 {
   auto a_unc = get_uncertainty(a_a);
   auto b_unc = get_uncertainty(a_b);
-  return abs(get_nominal(a_a) - get_nominal(a_b)) / sqrt(a_unc*a_unc + b_unc*b_unc);
+  return abs(get_nominal(a_a) - get_nominal(a_b)) / sqrt(a_unc * a_unc + b_unc * b_unc);
 }
 
 }  // namespace libUncertainty
