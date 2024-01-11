@@ -79,15 +79,29 @@ $ cmake ..
 $ cmake --build .
 $ cmake --build . --target install
 ```
-Or, if you use conan
-```
-$ conan remote add cd3 https://cdc3.jfrog.io/artifactory/api/conan/default-conan
-$ conan install libuncertainty/0.1@cd3/devel --build missing -g cmake_find_package
-```
 
 ### Dependencies
 
+The library is a header-only library and does not depend on third-party libraries, but the templates
+in the library work with the Boost.Units library. The unit tests, however, do depend on a few other libraries:
 
+- Boost
+- [BoostUnitDefinitions](https://github.com/CD3/BoostUnitDefinitions)
+- Catch2
+
+All of these dependencies can be installed with Conan using the `conanfile.txt` file in the root directory.
+
+```bash
+$ conan install . --build missing
+$ cmake --preset conan-default
+$ cmake --build --preset conan-release
+$ cd build
+$ ./testing/Release/libUncertainty_CatchTests
+```
+or, using [doit](https://pydoit.org/),
+```bash
+$ doit test
+```
 
 
 ## Usage
