@@ -1,14 +1,13 @@
-
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include "catch.hpp"
-
-#include <libUncertainty/utils.hpp>
-#include <libUncertainty/uncertain.hpp>
 #include <BoostUnitDefinitions/Units.hpp>
 
+#include <catch2/catch_all.hpp>
+#include <libUncertainty/uncertain.hpp>
+#include <libUncertainty/utils.hpp>
 
 using namespace boost::units;
 using namespace libUncertainty;
+using namespace Catch;
 
 TEST_CASE("Utility functions/classes Tests")
 {
@@ -71,35 +70,32 @@ TEST_CASE("Utility functions/classes Tests")
 
   SECTION("Uncertainy free functions")
   {
-    double x = 10;
-    uncertain<double> y(20,2);
+    double            x = 10;
+    uncertain<double> y(20, 2);
 
-    CHECK( !is_uncertain(x) );
-    CHECK(  is_uncertain(y) );
-    CHECK( !is_uncertain(1) );
-    CHECK(  is_uncertain(uncertain<double>(3,0.1)) );
+    CHECK(!is_uncertain(x));
+    CHECK(is_uncertain(y));
+    CHECK(!is_uncertain(1));
+    CHECK(is_uncertain(uncertain<double>(3, 0.1)));
 
-    CHECK( get_nominal(x) == Approx(10));
-    CHECK( get_uncertainty(x) == Approx(0).scale(1));
-    CHECK( get_upper(x) == Approx(10));
-    CHECK( get_lower(x) == Approx(10));
+    CHECK(get_nominal(x) == Approx(10));
+    CHECK(get_uncertainty(x) == Approx(0).scale(1));
+    CHECK(get_upper(x) == Approx(10));
+    CHECK(get_lower(x) == Approx(10));
 
-    CHECK( get_nominal(y) == Approx(20));
-    CHECK( get_uncertainty(y) == Approx(2));
-    CHECK( get_upper(y) == Approx(22));
-    CHECK( get_lower(y) == Approx(18));
+    CHECK(get_nominal(y) == Approx(20));
+    CHECK(get_uncertainty(y) == Approx(2));
+    CHECK(get_upper(y) == Approx(22));
+    CHECK(get_lower(y) == Approx(18));
 
-    CHECK( get_nominal(1) == Approx(1));
-    CHECK( get_uncertainty(1) == Approx(0).scale(1));
-    CHECK( get_upper(1) == Approx(1));
-    CHECK( get_lower(1) == Approx(1));
+    CHECK(get_nominal(1) == Approx(1));
+    CHECK(get_uncertainty(1) == Approx(0).scale(1));
+    CHECK(get_upper(1) == Approx(1));
+    CHECK(get_lower(1) == Approx(1));
 
-    CHECK( get_nominal(uncertain<double>(3,0.1)) == Approx(3));
-    CHECK( get_uncertainty(uncertain<double>(3,0.1)) == Approx(0.1));
-    CHECK( get_upper(uncertain<double>(3,0.1)) == Approx(3.1));
-    CHECK( get_lower(uncertain<double>(3,0.1)) == Approx(2.9));
-
-
-
+    CHECK(get_nominal(uncertain<double>(3, 0.1)) == Approx(3));
+    CHECK(get_uncertainty(uncertain<double>(3, 0.1)) == Approx(0.1));
+    CHECK(get_upper(uncertain<double>(3, 0.1)) == Approx(3.1));
+    CHECK(get_lower(uncertain<double>(3, 0.1)) == Approx(2.9));
   }
 }

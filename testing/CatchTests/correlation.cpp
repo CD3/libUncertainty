@@ -1,14 +1,15 @@
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include "catch.hpp"
+#include <BoostUnitDefinitions/Units.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
+#include <catch2/catch_all.hpp>
 #include <libUncertainty/correlation.hpp>
-#include <libUncertainty/uncertain.hpp>
 #include <libUncertainty/propagate.hpp>
-#include <BoostUnitDefinitions/Units.hpp>
+#include <libUncertainty/uncertain.hpp>
 
 using namespace boost::units;
 using namespace libUncertainty;
+using namespace Catch;
 
 TEST_CASE("Correlations Utilities")
 {
@@ -84,7 +85,7 @@ TEST_CASE("Correlations Utilities")
 
   SECTION("Correlation store")
   {
-    add_id<uncertain<double>> x,y,z;
+    add_id<uncertain<double>> x, y, z;
     correlation_store<double> store;
 
     store.add(x, y, 0.1);
@@ -105,14 +106,13 @@ TEST_CASE("Correlations Utilities")
     CHECK(global_store.get(x, y) == Approx(0.1));
     CHECK(global_store.get(x, z) == Approx(0.2));
 
-    global_store.set(x,y,0.5);
-    global_store.set(x,z,-0.5);
-    global_store.set(z,y,1);
+    global_store.set(x, y, 0.5);
+    global_store.set(x, z, -0.5);
+    global_store.set(z, y, 1);
 
-    CHECK(global_store.get(y,x) == Approx(0.5) );
-    CHECK(global_store.get(z,x) == Approx(-0.5) );
-    CHECK(global_store.get(z,y) == Approx(1) );
-
+    CHECK(global_store.get(y, x) == Approx(0.5));
+    CHECK(global_store.get(z, x) == Approx(-0.5));
+    CHECK(global_store.get(z, y) == Approx(1));
   }
 
   SECTION("Error propagation w/ correlation")
@@ -165,9 +165,7 @@ TEST_CASE("Correlations Utilities")
         CHECK(z.upper() == Approx(3 + unc));
         CHECK(cstore.get(z, xx) == Approx((0.1 + 0.2 * -1) / unc));
         CHECK(cstore.get(z, yy) == Approx((0.2 + 0.1 * -1) / unc));
-
       }
-
     }
 
     SECTION("boost quantities")

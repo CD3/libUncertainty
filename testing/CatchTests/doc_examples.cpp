@@ -1,15 +1,15 @@
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include "catch.hpp"
-
 #include <BoostUnitDefinitions/Units.hpp>
 
+#include <catch2/catch_all.hpp>
 #include <libUncertainty/correlation.hpp>
 #include <libUncertainty/propagate.hpp>
+#include <libUncertainty/statistics.hpp>
 #include <libUncertainty/uncertain.hpp>
 #include <libUncertainty/utils.hpp>
-#include <libUncertainty/statistics.hpp>
 
 using namespace libUncertainty;
+using namespace Catch;
 
 double my_calculation(double x, double y)
 {
@@ -91,31 +91,21 @@ TEST_CASE("README Examples")
   SECTION("Gravity Example")
   {
     using namespace boost::units;
-    std::vector<quantity<t::s>> time_data {
-        0.431*i::s
-      , 0.603*i::s
-      , 0.504*i::s
-      , 0.581*i::s
-      , 0.588*i::s
-      , 0.644*i::s
-      , 0.595*i::s
-      , 0.534*i::s
-      , 0.563*i::s
-      , 0.578*i::s
-      };
+    std::vector<quantity<t::s>> time_data{
+        0.431 * i::s, 0.603 * i::s, 0.504 * i::s, 0.581 * i::s, 0.588 * i::s, 0.644 * i::s, 0.595 * i::s, 0.534 * i::s, 0.563 * i::s, 0.578 * i::s};
 
-    auto time_measurement = make_uncertain(time_data.begin(), time_data.end());
-    auto height_measurement = make_uncertain( 1.5*i::m, 1*i::cm );
+    auto time_measurement   = make_uncertain(time_data.begin(), time_data.end());
+    auto height_measurement = make_uncertain(1.5 * i::m, 1 * i::cm);
 
-    auto calc_gravity = [](quantity<t::m> h, quantity<t::s> t) { return 2*h/t/t; };
+    auto calc_gravity = [](quantity<t::m> h, quantity<t::s> t) { return 2 * h / t / t; };
 
-    auto g = basic_error_propagator::propagate_error( calc_gravity, height_measurement, time_measurement );
-    g = g.normalize();
+    auto g = basic_error_propagator::propagate_error(calc_gravity, height_measurement, time_measurement);
+    g      = g.normalize();
 
     std::cout << "Measured g: " << g << std::endl;
-    std::cout << "z-score: " << z_score( g, 9.81*i::m/i::s/i::s ) << std::endl;
+    std::cout << "z-score: " << z_score(g, 9.81 * i::m / i::s / i::s) << std::endl;
 
-    CHECK( g.nominal().value() == Approx(9.5) );
-    CHECK( g.uncertainty().value() == Approx(0.6) );
+    CHECK(g.nominal().value() == Approx(9.5));
+    CHECK(g.uncertainty().value() == Approx(0.6));
   }
 }

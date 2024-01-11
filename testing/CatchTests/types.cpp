@@ -1,15 +1,18 @@
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include "catch.hpp"
-
 #include <iostream>
 #include <sstream>
-#include <libUncertainty/uncertain.hpp>
+
 #include <BoostUnitDefinitions/Units.hpp>
+
+#include <catch2/catch_all.hpp>
+#include <libUncertainty/uncertain.hpp>
 
 using namespace boost::units;
 using namespace libUncertainty;
+using namespace Catch;
 
-struct my_type {};
+struct my_type {
+};
 
 TEST_CASE("uncertain<...> tests")
 {
@@ -96,15 +99,14 @@ TEST_CASE("uncertain<...> tests")
   {
     SECTION("int")
     {
-      uncertain<int> x;
+      uncertain<int>    x;
       std::stringstream in("10 +/- 2");
 
       in >> x;
 
-      CHECK( x.nominal() == 10 );
-      CHECK( x.uncertainty() == 2 );
+      CHECK(x.nominal() == 10);
+      CHECK(x.uncertainty() == 2);
     }
-
   }
 
   SECTION("Normalization")
@@ -181,13 +183,12 @@ TEST_CASE("uncertain<...> tests")
       std::vector<double> vals{0.431, 0.603, 0.504, 0.581, 0.588, 0.644, 0.595, 0.534, 0.563, 0.578};
 
       auto t = make_uncertain(vals.begin(), vals.end());
-      CHECK( t.nominal() == Approx(0.5620999999999999) );
-      CHECK( t.uncertainty() == Approx(0.059718692402146764/sqrt(10)) );
+      CHECK(t.nominal() == Approx(0.5620999999999999));
+      CHECK(t.uncertainty() == Approx(0.059718692402146764 / sqrt(10)));
 
       t = make_uncertain(vals.begin(), vals.end(), tags::use_stdev_for_error{});
-      CHECK( t.nominal() == Approx(0.5620999999999999) );
-      CHECK( t.uncertainty() == Approx(0.059718692402146764) );
+      CHECK(t.nominal() == Approx(0.5620999999999999));
+      CHECK(t.uncertainty() == Approx(0.059718692402146764));
     }
-
   }
 }

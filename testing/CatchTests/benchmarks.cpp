@@ -1,10 +1,9 @@
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include "catch.hpp"
-
 #include <BoostUnitDefinitions/Units.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/type_traits/function_traits.hpp>
 
+#include <catch2/catch_all.hpp>
 #include <libUncertainty/correlation.hpp>
 #include <libUncertainty/propagate.hpp>
 #include <libUncertainty/uncertain.hpp>
@@ -22,13 +21,14 @@
 
 using namespace boost::units;
 using namespace libUncertainty;
+using namespace Catch;
 
 TEST_CASE("Memory Usage")
 {
-  CHECK( sizeof( uncertain<double> ) == 2*sizeof(double) );
-  CHECK( sizeof( add_id<uncertain<double>> ) == 2*sizeof(double)+sizeof(size_t) );
-  CHECK( sizeof( uncertainties::udouble ) > sizeof(uncertain<double>));
-  CHECK( sizeof( uncertainties::udouble ) > sizeof(add_id<uncertain<double>>));
+  CHECK(sizeof(uncertain<double>) == 2 * sizeof(double));
+  CHECK(sizeof(add_id<uncertain<double>>) == 2 * sizeof(double) + sizeof(size_t));
+  CHECK(sizeof(uncertainties::udouble) > sizeof(uncertain<double>));
+  CHECK(sizeof(uncertainties::udouble) > sizeof(add_id<uncertain<double>>));
 }
 
 TEST_CASE("Bencharmks", "[.][benchmarks]")
