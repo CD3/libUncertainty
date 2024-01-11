@@ -1,0 +1,11 @@
+[requires]
+boost/1.80.0
+cd3-boost-unit-definitions/0.2.2
+catch2/3.5.1
+[generators]
+CMakeDeps
+CMakeToolchain
+[layout]
+cmake_layout
+[options]
+boost/*:header_only = True

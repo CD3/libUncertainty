@@ -1,2 +1,5 @@
 build-*/
 .*.swp
+__pycache__
+.doit.db
+CMakeUserPresets.json
